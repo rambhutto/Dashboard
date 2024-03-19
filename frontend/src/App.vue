@@ -60,33 +60,31 @@ async function getWorkSheet(worksheetName) {
 }
 
 async function convertCellsToJsonObject(colsToInclude) {
-  let nodeList = {"test": "test"}
-  // await initTableau()
-  // log("yeet")
-  //
-  // colsToInclude = [7, 8]
-  //
-  // let worksheet = await getWorkSheet()
-  // let dataTable = await getSummaryDataTables(worksheet)
-  // dataTable = await getSourcesDataTables(worksheet)
-  //
-  // const nodeList = []
-  //
-  // dataTable.data.forEach((row, rowIndex) => {
-  //   let node = {}
-  //   row.forEach((col, colIndex) => {
-  //     if (colsToInclude.includes(colIndex)) {
-  //       node[dataTable.columns[colIndex].fieldName] = col.value
-  //     }
-  //   })
-  //   nodeList.push(node)
-  // })
-  log("yeet")
-  new Promise(resolve => setTimeout(resolve, 1000)).then()
+  let nodeList = []
+  await initTableau()
+
+  colsToInclude = [7, 8]
+
+  let worksheet = await getWorkSheet()
+  let dataTable = await getSummaryDataTables(worksheet)
+  dataTable = await getSourcesDataTables(worksheet)
+
+  nodeList = []
+
+  dataTable.data.forEach((row, rowIndex) => {
+    let node = {}
+    row.forEach((col, colIndex) => {
+      if (colsToInclude.includes(colIndex)) {
+        node[dataTable.columns[colIndex].fieldName] = col.value
+      }
+    })
+    nodeList.push(node)
+  })
   return nodeList
 }
 
 let nodes = ref(null)
+//could just call it in mount
 convertCellsToJsonObject().then(res => {
   nodes.value = res
 })

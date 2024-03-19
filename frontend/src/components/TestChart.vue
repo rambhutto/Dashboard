@@ -36,13 +36,44 @@ provide(THEME_KEY, 'dark');
 
 onMounted(() => {
   console.log(props.nodes, props.categories, props.edges)
-  setDummyGraphData()
-  test.value = JSON.stringify(props.nodes)
+  // setDummyGraphData()
 })
 //Hacky
 watch(() => props.nodes, (oldValue, newValue) => {
-  console.log(oldValue, newValue)
+  // test.value = JSON.stringify(props.nodes)
+  makeGraph()
 }, {immediate: true})
+
+function makeGraph() {
+  option.value = {
+    series: [
+      {
+        type: 'graph',
+        layout: 'force',
+        animation: false,
+        label: {
+          position: 'right',
+          formatter: '{b}'
+        },
+        draggable: true,
+        data: props.nodes.map(function (node, idx) {
+          node.name = node["Series Title"]
+          node.id = idx;
+          node.symbolSize = Math.random() * 25
+          test.value = JSON.stringify(node)
+          return node;
+        }),
+        // categories: data.value.categories,
+        force: {
+          edgeLength: 15,
+          repulsion: 20,
+          gravity: 0.2
+        },
+        // edges: data.value.links
+      }
+    ],
+  }
+}
 
 function setDummyGraphData() {
   data.value = {
