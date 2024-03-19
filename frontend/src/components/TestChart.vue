@@ -14,6 +14,12 @@ const $axios = inject('$axios')  // inject axios
 
 let data = ref({})
 
+const props = defineProps({
+  node: {},
+  edges: {},
+  categories: {}
+})
+
 use([
   CanvasRenderer,
   PieChart,
@@ -26,6 +32,7 @@ use([
 provide(THEME_KEY, 'dark');
 
 onMounted(() => {
+  console.log(props.node, props.categories, props.edges)
   setDummyGraphData()
 })
 
@@ -5761,7 +5768,7 @@ function setDummyGraphData() {
         draggable: true,
         data: data.value.nodes.map(function (node, idx) {
           node.id = idx;
-          node.symbolSize = Math.random()*25
+          node.symbolSize = Math.random() * 25
           return node;
         }),
         categories: data.value.categories,

@@ -16,7 +16,7 @@ onMounted(async () => {
         let dataTable = await getSummaryDataTables(worksheet)
         dataTable = await getSourcesDataTables(worksheet)
         currentDataTable.value = dataTable
-
+        await convertRowToNodes()
 
       } catch (error) {
         err.value = error;
@@ -43,9 +43,6 @@ async function initTableau() {
 
 async function getSourcesDataTables(worksheet) {//Currently only returns one data table
   const dataSources = await worksheet.getDataSourcesAsync();
-  dataSources.forEach(dataSource => {
-    log(dataSource.name)
-  })
   const dataSource = dataSources[0];
   const logicalTables = await dataSource.getLogicalTablesAsync()
   const dataTable = await dataSource.getLogicalTableDataAsync(logicalTables[0].id);
@@ -61,10 +58,28 @@ async function getSummaryDataTables(worksheet) {
 }
 
 async function getWorkSheet(worksheetName) {
-  log(extensions)
   worksheetName = 'Imdb_WS'; // Name of the worksheet, make it dynamic later
   return extensions.dashboardContent.dashboard.worksheets.find(w => w.name === worksheetName)
 }
+
+async function convertRowToNodes() {
+  let worksheet = await getWorkSheet()
+  let dataTable = await getSummaryDataTables(worksheet)
+  dataTable = await getSourcesDataTables(worksheet)
+
+  const nodeList = []
+  dataTable.data.forEach((row, rowIndex) => {
+    row.forEach((col, colIndex) => {
+      if (colIndex === 1) {
+        let node = {}
+        node[dataTable.columns[1].fieldName] = col.value
+        nodeList.push(node)
+      }
+    })
+  })
+  log(JSON.stringify(nodeList))
+}
+
 </script>
 
 <template>
