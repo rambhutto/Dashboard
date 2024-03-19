@@ -6,8 +6,7 @@ const dashboard = ref("")
 const err = ref("")
 
 const currentDataTable = ref({})
-let extensions
-
+let extensions = ref({})
 
 onMounted(async () => {
       try {
@@ -16,8 +15,6 @@ onMounted(async () => {
         let dataTable = await getSummaryDataTables(worksheet)
         dataTable = await getSourcesDataTables(worksheet)
         currentDataTable.value = dataTable
-        await convertRowToNodes()
-
       } catch (error) {
         err.value = error;
       }
@@ -62,33 +59,45 @@ async function getWorkSheet(worksheetName) {
   return extensions.dashboardContent.dashboard.worksheets.find(w => w.name === worksheetName)
 }
 
-async function convertRowToNodes() {
-  let worksheet = await getWorkSheet()
-  let dataTable = await getSummaryDataTables(worksheet)
-  dataTable = await getSourcesDataTables(worksheet)
-
-  const nodeList = []
-  dataTable.data.forEach((row, rowIndex) => {
-    row.forEach((col, colIndex) => {
-      if (colIndex === 1) {
-        let node = {}
-        node[dataTable.columns[1].fieldName] = col.value
-        nodeList.push(node)
-      }
-    })
-  })
-  log(JSON.stringify(nodeList))
+async function convertCellsToJsonObject(colsToInclude) {
+  let nodeList = {"test": "test"}
+  // await initTableau()
+  // log("yeet")
+  //
+  // colsToInclude = [7, 8]
+  //
+  // let worksheet = await getWorkSheet()
+  // let dataTable = await getSummaryDataTables(worksheet)
+  // dataTable = await getSourcesDataTables(worksheet)
+  //
+  // const nodeList = []
+  //
+  // dataTable.data.forEach((row, rowIndex) => {
+  //   let node = {}
+  //   row.forEach((col, colIndex) => {
+  //     if (colsToInclude.includes(colIndex)) {
+  //       node[dataTable.columns[colIndex].fieldName] = col.value
+  //     }
+  //   })
+  //   nodeList.push(node)
+  // })
+  log("yeet")
+  new Promise(resolve => setTimeout(resolve, 1000)).then()
+  return nodeList
 }
 
+let nodes = ref(null)
+convertCellsToJsonObject().then(res => {
+  nodes.value = res
+})
 </script>
 
 <template>
   <p>{{ err }}</p>
   <v-container>
     <p class="text-wrap"> {{ dashboard }} </p>
-
   </v-container>
-  <test-chart></test-chart>
+  <test-chart v-if="extensions" :nodes="nodes"></test-chart>
   <v-table fixed-header height="70vh" density="compact">
     <thead>
       <tr>

@@ -8,17 +8,20 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import VChart, {THEME_KEY} from 'vue-echarts';
-import {ref, provide, onMounted, inject} from 'vue';
+import {ref, provide, onMounted, inject, watch} from 'vue';
+import {no} from "vuetify/locale";
 
 const $axios = inject('$axios')  // inject axios
 
 let data = ref({})
+const option = ref();
 
 const props = defineProps({
-  node: {},
-  edges: {},
-  categories: {}
+  nodes: undefined,
+  edges: undefined,
+  categories: undefined
 })
+const test = ref({})
 
 use([
   CanvasRenderer,
@@ -32,9 +35,14 @@ use([
 provide(THEME_KEY, 'dark');
 
 onMounted(() => {
-  console.log(props.node, props.categories, props.edges)
+  console.log(props.nodes, props.categories, props.edges)
   setDummyGraphData()
+  test.value = JSON.stringify(props.nodes)
 })
+//Hacky
+watch(() => props.nodes, (oldValue, newValue) => {
+  console.log(oldValue, newValue)
+}, {immediate: true})
 
 function setDummyGraphData() {
   data.value = {
@@ -5783,11 +5791,12 @@ function setDummyGraphData() {
   }
 }
 
-const option = ref();
 </script>
 
 <template>
   <v-chart class="chart" :option="option" autoresize/>
+  <p v-if="nodes">{{ test }}</p>
+  <p v-if="edges">testedges</p>
 </template>
 
 <style scoped>
