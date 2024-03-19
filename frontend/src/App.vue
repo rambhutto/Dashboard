@@ -73,7 +73,7 @@ async function getWorkSheet(worksheetName) {
     <p class="text-wrap"> {{ dashboard }} </p>
 
   </v-container>
-  <!--  <test-chart></test-chart>-->
+  <test-chart></test-chart>
   <v-table fixed-header height="70vh" density="compact">
     <thead>
       <tr>
