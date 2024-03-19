@@ -1,6 +1,7 @@
 <script setup>
 import TestChart from "@/components/TestChart.vue";
 import {onMounted, ref} from "vue";
+import Dropdown from 'primevue/dropdown';
 
 const dashboard = ref("")
 const err = ref("")
@@ -82,25 +83,28 @@ async function convertCellsToJsonObject(colsToInclude) {
   })
   //Find out columns in the sheet
   columns.value.length = 0
-  columns.value.push(dataTable.columns.map(col => {
-    return col.fieldName
-  }))
-  log(columns.value)
+  let cols = dataTable.columns.map(col => {
+    return {"name": col.fieldName}
+  })
+  columns.value.push(...cols)
+  log(JSON.stringify(columns))
   return nodeList
 }
 
 let nodes = ref(null)
 let columns = ref([])
-//could just call it in mount
+// could just call it in mount
 convertCellsToJsonObject().then(res => {
   nodes.value = res
 })
+let selectedColumns = ref()
 </script>
 
 <template>
   <v-app>
     <p>{{ err }}</p>
     <p class="text-wrap"> {{ dashboard }} </p>
+    <p class="text-wrap"> {{ selectedColumns }} </p>
     <!--  <test-chart v-if="extensions" :nodes="nodes"></test-chart>-->
     <v-form ref="form">
       <v-text-field
@@ -110,6 +114,8 @@ convertCellsToJsonObject().then(res => {
           required
       ></v-text-field>
     </v-form>
+    <Dropdown v-model="selectedColumns" optionLabel="name" :options="columns" placeholder="Select a City"
+              class="w-full md:w-14rem" style="z-index: 50000"/>
     <v-table v-if="false" fixed-header height="70vh" density="compact">
       <thead>
         <tr>
