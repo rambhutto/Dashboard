@@ -1,6 +1,6 @@
 <script setup>
 import TestChart from "@/components/TestChart.vue";
-import {onMounted, ref} from "vue";
+import {onMounted, ref, watch} from "vue";
 import Dropdown from 'primevue/dropdown';
 
 const dashboard = ref("")
@@ -9,6 +9,7 @@ const err = ref("")
 const currentDataTable = ref({})
 let extensions = ref({})
 
+let worksheets = ref()
 onMounted(async () => {
       try {
         await initTableau()
@@ -16,6 +17,8 @@ onMounted(async () => {
         let dataTable = await getSummaryDataTables(worksheet)
         dataTable = await getSourcesDataTables(worksheet)
         currentDataTable.value = dataTable
+
+        worksheets.value = await getAllWorkSheets()
       } catch (error) {
         err.value = error;
       }
@@ -23,7 +26,7 @@ onMounted(async () => {
 )
 
 function log(msg) {
-  dashboard.value = dashboard.value + " " + msg
+  dashboard.value = dashboard.value + " " + JSON.stringify(msg)
 }
 
 async function initTableau() {
@@ -56,8 +59,15 @@ async function getSummaryDataTables(worksheet) {
 }
 
 async function getWorkSheet(worksheetName) {
-  worksheetName = 'Imdb_WS'; // Name of the worksheet, make it dynamic later
+  worksheetName = "Imdb_WS"
+  if (selectedWorkSheet.value != null) {
+    worksheetName = selectedWorkSheet.value.name; // Name of the worksheet, make it dynamic later
+  }
   return extensions.dashboardContent.dashboard.worksheets.find(w => w.name === worksheetName)
+}
+
+async function getAllWorkSheets() {
+  return extensions.dashboardContent.dashboard.worksheets
 }
 
 async function convertCellsToJsonObject(colsToInclude) {
@@ -67,8 +77,7 @@ async function convertCellsToJsonObject(colsToInclude) {
   colsToInclude = [7, 8]
 
   let worksheet = await getWorkSheet()
-  let dataTable = await getSummaryDataTables(worksheet)
-  dataTable = await getSourcesDataTables(worksheet)
+  let dataTable = await getSourcesDataTables(worksheet)
 
   nodeList = []
 
@@ -82,13 +91,15 @@ async function convertCellsToJsonObject(colsToInclude) {
     nodeList.push(node)
   })
   //Find out columns in the sheet
-  columns.value.length = 0
-  let cols = dataTable.columns.map(col => {
-    return {"name": col.fieldName}
-  })
-  columns.value.push(...cols)
-  log(JSON.stringify(columns))
+
   return nodeList
+}
+
+async function getColumns() {
+  let worksheet = await getWorkSheet()
+  let dataTable = await getSourcesDataTables(worksheet)
+  columns.value.length = 0
+  columns.value.push(...dataTable.columns)
 }
 
 let nodes = ref(null)
@@ -98,6 +109,12 @@ convertCellsToJsonObject().then(res => {
   nodes.value = res
 })
 let selectedColumns = ref()
+let selectedWorkSheet = ref()
+
+watch((selectedWorkSheet), async () => {
+  console.log("changed")
+  await getColumns()
+})
 </script>
 
 <template>
@@ -105,17 +122,13 @@ let selectedColumns = ref()
     <p>{{ err }}</p>
     <p class="text-wrap"> {{ dashboard }} </p>
     <p class="text-wrap"> {{ selectedColumns }} </p>
+    <p class="text-wrap" v-if="selectedWorkSheet"> {{ selectedWorkSheet.name }} </p>
+
+    <Dropdown v-model="selectedWorkSheet" optionLabel="name" :options="worksheets" placeholder="Select Worksheet"
+              class="w-full md:w-14rem"/>
+    <Dropdown v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" placeholder="Node"
+              class="w-full md:w-14rem"/>
     <!--  <test-chart v-if="extensions" :nodes="nodes"></test-chart>-->
-    <v-form ref="form">
-      <v-text-field
-          v-model="name"
-          :counter="10"
-          label="Name"
-          required
-      ></v-text-field>
-    </v-form>
-    <Dropdown v-model="selectedColumns" optionLabel="name" :options="columns" placeholder="Select a City"
-              class="w-full md:w-14rem" style="z-index: 50000"/>
     <v-table v-if="false" fixed-header height="70vh" density="compact">
       <thead>
         <tr>
