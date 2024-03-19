@@ -1,7 +1,6 @@
 <script setup>
 import TestChart from "@/components/TestChart.vue";
 import {onMounted, ref, watch} from "vue";
-import Dropdown from 'primevue/dropdown';
 
 const dashboard = ref("")
 const err = ref("")
@@ -115,33 +114,39 @@ watch((selectedWorkSheet), async () => {
   console.log("changed")
   await getColumns()
 })
+
+let selected = ref([])
 </script>
 
 <template>
-  <v-app>
-    <p>{{ err }}</p>
-    <p class="text-wrap"> {{ dashboard }} </p>
-    <p class="text-wrap"> {{ selectedColumns }} </p>
-    <p class="text-wrap" v-if="selectedWorkSheet"> {{ selectedWorkSheet.name }} </p>
+  <p>{{ err }}</p>
+  <p class="text-wrap"> {{ dashboard }} </p>
+  <p class="text-wrap"> {{ selectedColumns }} </p>
+  <p class="text-wrap" v-if="selectedWorkSheet"> {{ selectedWorkSheet.name }} </p>
+  <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
+            label="Select Worksheet"></q-select>
+  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>
 
-    <Dropdown v-model="selectedWorkSheet" optionLabel="name" :options="worksheets" placeholder="Select Worksheet"
-              class="w-full md:w-14rem"/>
-    <Dropdown v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" placeholder="Node"
-              class="w-full md:w-14rem"/>
-    <!--  <test-chart v-if="extensions" :nodes="nodes"></test-chart>-->
-    <v-table v-if="false" fixed-header height="70vh" density="compact">
-      <thead>
-        <tr>
-          <th v-for="(col, index) in currentDataTable.columns" :key="index">{{ col.fieldName }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(row, rowIndex) in currentDataTable.data" :key="rowIndex">
-          <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell.value }}</td>
-        </tr>
-      </tbody>
-    </v-table>
-  </v-app>
+
+  <test-chart v-if="extensions" :nodes="nodes"></test-chart>
+  <q-table
+      title="Movies"
+      :rows="currentDataTable.data"
+      :columns="currentDataTable.data"
+  ></q-table>
+  <q-table
+      :rows="currentDataTable.data"
+      :columns="currentDataTable.columns"
+      row-key="rowIndex"
+      :style="{ height: '70vh' }"
+      :dense="true"
+      v-model:selected="selected"
+      selection="single"
+  >
+  </q-table>
+  <div class="q-mt-md">
+    Selected: {{ JSON.stringify(selected) }}
+  </div>
 </template>
 
 <style scoped>
