@@ -35,12 +35,10 @@ use([
 provide(THEME_KEY, 'dark');
 
 onMounted(() => {
-  console.log(props.nodes, props.categories, props.edges)
   // setDummyGraphData()
 })
 //Hacky
 watch(() => props.nodes, (oldValue, newValue) => {
-  // test.value = JSON.stringify(props.nodes)
   makeGraph()
 }, {immediate: true})
 
