@@ -80,10 +80,17 @@ async function convertCellsToJsonObject(colsToInclude) {
     })
     nodeList.push(node)
   })
+  //Find out columns in the sheet
+  columns.value.length = 0
+  columns.value.push(dataTable.columns.map(col => {
+    return col.fieldName
+  }))
+  log(columns.value)
   return nodeList
 }
 
 let nodes = ref(null)
+let columns = ref([])
 //could just call it in mount
 convertCellsToJsonObject().then(res => {
   nodes.value = res
@@ -91,24 +98,31 @@ convertCellsToJsonObject().then(res => {
 </script>
 
 <template>
-  <p>{{ err }}</p>
-  <v-container>
+  <v-app>
+    <p>{{ err }}</p>
     <p class="text-wrap"> {{ dashboard }} </p>
-  </v-container>
-  <test-chart v-if="extensions" :nodes="nodes"></test-chart>
-  <v-table fixed-header height="70vh" density="compact">
-    <thead>
-      <tr>
-        <th v-for="(col, index) in currentDataTable.columns" :key="index">{{ col.fieldName }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(row, rowIndex) in currentDataTable.data" :key="rowIndex">
-        <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell.value }}</td>
-      </tr>
-    </tbody>
-  </v-table>
-
+    <!--  <test-chart v-if="extensions" :nodes="nodes"></test-chart>-->
+    <v-form ref="form">
+      <v-text-field
+          v-model="name"
+          :counter="10"
+          label="Name"
+          required
+      ></v-text-field>
+    </v-form>
+    <v-table v-if="false" fixed-header height="70vh" density="compact">
+      <thead>
+        <tr>
+          <th v-for="(col, index) in currentDataTable.columns" :key="index">{{ col.fieldName }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(row, rowIndex) in currentDataTable.data" :key="rowIndex">
+          <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell.value }}</td>
+        </tr>
+      </tbody>
+    </v-table>
+  </v-app>
 </template>
 
 <style scoped>
