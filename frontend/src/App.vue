@@ -235,18 +235,12 @@ function clearColumnsValues() {
 
 watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn, categoryColumn], async () => {
   await getColumns()
-  convertCellsToJsonObject().then(res => {
-    nodes.value = res
-  })
+  nodes.value = await convertCellsToJsonObject()
+  edges.value = await generateLinks()
 
-  generateLinks().then((res => {
-    edges.value = res
-  }))
-
-  generateCategories().then((res => {
-    categories.value = res["categories"]
-    legend.value = res["pushedCategories"]
-  }))
+  let cat = await generateCategories()
+  categories.value = cat["categories"]
+  legend.value = cat["pushedCategories"]
 })
 
 
