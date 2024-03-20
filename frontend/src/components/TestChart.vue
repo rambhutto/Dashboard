@@ -5852,7 +5852,7 @@ function setDummyGraphData() {
 
 <style scoped>
 .chart {
-  height: 90vh;
-  width: 75vw;
+  height: 100%;
+  width: 75%;
 }
 </style>

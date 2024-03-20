@@ -13,6 +13,7 @@ let worksheets = ref()
 let selectedColumns = ref()
 let linkColumns = ref()
 let sizeColumn = ref(6)
+let categoryColumn = ref(2)
 let selectedWorkSheet = ref()
 onMounted(async () => {
       try {
@@ -77,6 +78,10 @@ async function convertCellsToJsonObject(colsToInclude, sizeCol) {
   if (sizeColumn.value !== null && typeof sizeColumn.value === "object") {
     sizeCol = sizeColumn.value["index"]
   }
+  let column = 2
+  if (categoryColumn.value !== null && typeof categoryColumn.value === "object") {
+    column = sizeColumn.value["index"]
+  }
   let nodeList = []
   await initTableau()
 
@@ -106,7 +111,7 @@ async function convertCellsToJsonObject(colsToInclude, sizeCol) {
     node["id"] = rowIndex
     nodeList.push(node)
   })
-  //Find out columns in the sheet
+  //Find out columns in he sheet
   return nodeList
 }
 
@@ -213,6 +218,9 @@ async function generateLinks(columnsToLinkOn) {
 
 async function generateCategories(column) {
   column = 2
+  if (categoryColumn.value !== null && typeof categoryColumn.value === "object") {
+    column = 2
+  }
   await initTableau()
 
   let worksheet = await getWorkSheet()
@@ -235,15 +243,35 @@ async function generateCategories(column) {
 </script>
 
 <template>
-  <p>{{ err }}</p>
-  <p class="text-wrap"> {{ dashboard }} </p>
-  <test-chart :nodes="nodes" :edges="edges" :categories="categories"></test-chart>
+  <q-layout>
+    <q-drawer
+        show-if-above
+        :width="200"
+        elevated
+        class=" text-white"
+    >
+      <q-scroll-area class="fit">
+        <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
+                  label="Select Worksheet"></q-select>
+        <!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
+        <!--  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>-->
+        <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
+        <button></button>
+      </q-scroll-area>
+    </q-drawer>
+    <q-page-container>
+      <q-page padding>
 
-  <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
-            label="Select Worksheet"></q-select>
-  <!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
-  <!--  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>-->
-  <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>
+        <p>{{ err }}</p>
+        <p class="text-wrap"> {{ dashboard }} </p>
+        <div style="height:600px">
+          <test-chart :nodes="nodes" :edges="edges" :categories="categories"></test-chart>
+        </div>
+
+
+      </q-page>
+    </q-page-container>
+  </q-layout>
 
   <!--  <q-table-->
   <!--      :rows="currentDataTable.data"-->
