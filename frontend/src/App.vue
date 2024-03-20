@@ -9,6 +9,11 @@ const currentDataTable = ref({})
 let extensions = ref({})
 
 let worksheets = ref()
+
+let selectedColumns = ref()
+let linkColumns = ref()
+let sizeColumn = ref(6)
+let selectedWorkSheet = ref()
 onMounted(async () => {
       try {
         await initTableau()
@@ -33,7 +38,6 @@ async function initTableau() {
 
   try {
     await extensions.initializeAsync()
-    log(extensions.dashboardContent.dashboard.name)
   } catch
       (error) {
     err.value = error
@@ -69,7 +73,10 @@ async function getAllWorkSheets() {
   return extensions.dashboardContent.dashboard.worksheets
 }
 
-async function convertCellsToJsonObject(colsToInclude) {
+async function convertCellsToJsonObject(colsToInclude, sizeCol) {
+  if (sizeColumn.value !== null && typeof sizeColumn.value === "object") {
+    sizeCol = sizeColumn.value["index"]
+  }
   let nodeList = []
   await initTableau()
 
@@ -86,12 +93,14 @@ async function convertCellsToJsonObject(colsToInclude) {
       if (colsToInclude.includes(colIndex)) {
         node[dataTable.columns[colIndex].fieldName] = col.value
       }
+      if (sizeCol === colIndex) {
+        node["size"] = col.value
+      }
     })
     node["id"] = rowIndex
     nodeList.push(node)
   })
   //Find out columns in the sheet
-
   return nodeList
 }
 
@@ -110,17 +119,25 @@ convertCellsToJsonObject().then(res => {
   nodes.value = res
 })
 
-generateLinks().then((res =>{
+generateLinks().then((res => {
   edges.value = res
 }))
-let selectedColumns = ref()
-let linkColumns = ref()
-let selectedWorkSheet = ref()
+
 
 watch((selectedWorkSheet), async () => {
-  console.log("changed")
   await getColumns()
   await generateLinks()
+})
+
+watch((sizeColumn), async () => {
+  convertCellsToJsonObject().then(res => {
+    nodes.value = res
+  })
+
+  generateLinks().then((res => {
+    edges.value = res
+  }))
+  log("this happeend")
 })
 
 let selected = ref([])
@@ -191,8 +208,9 @@ async function generateLinks(columnsToLinkOn) {
 
   <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
             label="Select Worksheet"></q-select>
-  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>
-  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>
+<!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
+<!--  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>-->
+  <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>
 
   <!--  <q-table-->
   <!--      :rows="currentDataTable.data"-->

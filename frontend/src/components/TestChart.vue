@@ -38,9 +38,22 @@ onMounted(() => {
   // setDummyGraphData()
 })
 //Hacky
-watch( props.edges, (oldValue, newValue) => {
+watch(() => props.edges, (oldValue, newValue) => {
   makeGraph()
+  console.log(oldValue, newValue)
 }, {immediate: true})
+
+watch(() => props.nodes, (oldValue, newValue) => {
+  makeGraph()
+  console.log(oldValue, newValue)
+}, {immediate: true})
+
+function normalizeValue(value, min, max) {
+  if (!value) {
+    return 25
+  }
+  return (value - min) / (max - min) * 25;
+}
 
 function makeGraph() {
   option.value = {
@@ -56,9 +69,10 @@ function makeGraph() {
         draggable: true,
         data: props.nodes.map(function (node, idx) {
           node.name = node["Series Title"]
-          node.id = node["id"];
-          node.symbolSize = Math.random() * 25
-
+          node.id = node["id"]
+          node["size"] = node["size"]
+          node.symbolSize = normalizeValue(node["size"], 7, 10)
+          test.value = node
           return node;
         }),
         // categories: data.value.categories,
