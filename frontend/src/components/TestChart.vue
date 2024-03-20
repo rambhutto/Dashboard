@@ -33,12 +33,12 @@ let min = ref(Number.MAX_SAFE_INTEGER)
 
 
 //Call function on prop change/update
-watch(() => [props.edges, props.nodes, props.categories], () => {
+watch(() => props, () => {
   if (props.nodes) {
     findMaxMin()
     makeGraph()
   }
-}, {immediate: true})
+}, {immediate: true, deep: true})
 
 //findMaximum and minimum of a give node list, used for normalization
 function findMaxMin() {
@@ -93,13 +93,12 @@ function makeGraph() {
           console.log(node["symbolSize"])
           return node;
         }),
-        // categories: data.value.categories,
+        edges: props.edges,
+        categories: props.categories,
         force: {
           edgeLength: 5,
           repulsion: 5,
         },
-        edges: props.edges,
-        categories: props.categories,
         emphasis: {
           focus: 'adjacency',
           lineStyle: {
