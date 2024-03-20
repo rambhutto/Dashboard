@@ -31,7 +31,6 @@ const option = ref();//Graph Options
 let max = ref(0)
 let min = ref(Number.MAX_SAFE_INTEGER)
 
-
 //Call function on prop change/update
 watch(() => props, () => {
   if (props.nodes) {
@@ -90,7 +89,6 @@ function makeGraph() {
           node["size"] = node["size"]
 
           node.symbolSize = normalizeValue(node["size"])
-          console.log(node["symbolSize"])
           return node;
         }),
         edges: props.edges,

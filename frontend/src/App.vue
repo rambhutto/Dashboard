@@ -3,9 +3,7 @@ import TestChart from "@/components/TestChart.vue";
 import {onMounted, ref, watch} from "vue";
 
 const dashboard = ref("")
-const err = ref("")
 
-const currentDataTable = ref({})
 let tableau
 
 //Props
@@ -18,6 +16,7 @@ let worksheets = ref()
 
 
 let columns = ref([])
+let numericColumns = ref([])
 //Option Columns
 let nameColumn = ref()
 let linkColumns = ref()
@@ -26,23 +25,11 @@ let categoryColumn = ref()
 let selectedWorkSheet = ref()
 //Use underlying data
 let useUnderLyingData = ref(false)
+
 onMounted(async () => {
       try {
         tableau = await initTableau()
-        let worksheet = await getWorkSheet()
-        let dataTable = await getSummaryDataTables(worksheet)
-        dataTable = await getSourcesDataTables(worksheet)
-        currentDataTable.value = dataTable
-
         worksheets.value = await getAllWorkSheets()
-
-        convertCellsToJsonObject().then(res => {
-          nodes.value = res
-        })
-
-        generateLinks().then((res => {
-          edges.value = res
-        }))
       } catch (error) {
         err.value = error;
       }
@@ -56,7 +43,7 @@ async function initTableau() {
     await tableauExt.initializeAsync()
   } catch
       (error) {
-    err.value = error
+    console.log(error)
   }
   return tableauExt
 }
@@ -66,11 +53,10 @@ function log(msg) {
 }
 
 async function getWorkSheet(worksheetName) {
-  worksheetName = "Imdb_WS"
   if (selectedWorkSheet.value != null) {
     worksheetName = selectedWorkSheet.value.name; // Name of the worksheet, make it dynamic later
+    return tableau.dashboardContent.dashboard.worksheets.find(w => w.name === worksheetName)
   }
-  return tableau.dashboardContent.dashboard.worksheets.find(w => w.name === worksheetName)
 }
 
 async function getAllWorkSheets() {
@@ -140,6 +126,9 @@ async function getColumns() {
   let dataTable = await getDataTables(worksheet)
   columns.value.length = 0
   columns.value.push(...dataTable.columns)
+
+  numericColumns.value.length = 0
+  numericColumns.value.push(...dataTable.columns.filter(column => column.dataType === "int" || column.dataType === "float"))
 }
 
 async function generateLinks(columnsToLinkOn) {
@@ -254,7 +243,7 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
   </div>
   <div>
     <div class="row">
-      <div class="col">
+      <div class="col  ">
         <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
                   label="Select Worksheet"></q-select>
       </div>
@@ -263,11 +252,27 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
                     @click="clearColumnsValues"></q-checkbox>
       </div>
     </div>
+    <div class="row">
+      <div class="col q-mr-md">
+        <q-select v-model="nameColumn" optionLabel="fieldName" showClear :options="columns"
+                  label="Name Column"></q-select>
+      </div>
+      <div class="col">
+        <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns"
+                  label="Connect On"></q-select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col q-mr-md">
+        <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="numericColumns"
+                  label="Size On"></q-select>
+      </div>
+      <div class="col">
+        <q-select v-model="categoryColumn" optionLabel="fieldName" showClear :options="columns"
+                  label="Color On"></q-select>
+      </div>
+    </div>
   </div>
-  <q-select v-model="nameColumn" optionLabel="fieldName" showClear :options="columns" label="Name Column"></q-select>
-  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="Connect On"></q-select>
-  <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
-  <q-select v-model="categoryColumn" optionLabel="fieldName" showClear :options="columns" label="Color On"></q-select>
 </template>
 
 <style scoped>
