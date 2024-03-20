@@ -22,7 +22,8 @@ const props = defineProps({
   categories: undefined
 })
 const test = ref({})
-
+let max = ref(0)
+let min = ref(Number.MAX_SAFE_INTEGER)
 use([
   CanvasRenderer,
   PieChart,
@@ -39,20 +40,36 @@ onMounted(() => {
 })
 //Hacky
 watch(() => props.edges, (oldValue, newValue) => {
+  findMaxMin()
   makeGraph()
   console.log(oldValue, newValue)
 }, {immediate: true})
 
 watch(() => props.nodes, (oldValue, newValue) => {
+  findMaxMin()
   makeGraph()
   console.log(oldValue, newValue)
 }, {immediate: true})
 
-function normalizeValue(value, min, max) {
+function findMaxMin() {
+  props.nodes.forEach((node, rowIndex) => {
+    if (node["size"]) {
+      if (node["size"] > max.value) {
+        max.value = node["size"]
+      }
+
+      if (node["size"] < min.value) {
+        min.value = node["size"]
+      }
+    }
+  })
+}
+
+function normalizeValue(value) {
   if (!value) {
     return 25
   }
-  return (value - min) / (max - min) * 25;
+  return (value - min.value) / (max.value - min.value) * 25;
 }
 
 function makeGraph() {
@@ -71,7 +88,7 @@ function makeGraph() {
           node.name = node["Series Title"]
           node.id = node["id"]
           node["size"] = node["size"]
-          node.symbolSize = normalizeValue(node["size"], 7, 10)
+          node.symbolSize = normalizeValue(node["size"])
           test.value = node
           return node;
         }),
