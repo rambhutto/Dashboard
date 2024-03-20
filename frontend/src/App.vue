@@ -92,17 +92,10 @@ async function getAllWorkSheets() {
   return tableau.dashboardContent.dashboard.worksheets
 }
 
-async function convertCellsToJsonObject(colsToInclude, sizeCol) {
-  if (sizeColumn.value !== null && typeof sizeColumn.value === "object") {
-    sizeCol = sizeColumn.value["index"]
-  }
-  let column = 2
-  if (categoryColumn.value !== null && typeof categoryColumn.value === "object") {
-    column = categoryColumn.value["index"]
-  }
+async function convertCellsToJsonObject(colsToInclude) {
   let nodeList = []
 
-  colsToInclude = [7, 8]
+  colsToInclude = [7]
 
   let worksheet = await getWorkSheet()
   let dataTable = await getSourcesDataTables(worksheet)
@@ -118,17 +111,19 @@ async function convertCellsToJsonObject(colsToInclude, sizeCol) {
       if (colsToInclude.includes(colIndex)) {
         node[dataTable.columns[colIndex].fieldName] = col.value
       }
-      if (sizeCol === colIndex) {
-        node["size"] = col.value
+
+      if (sizeColumn.value?.index === colIndex && typeof sizeColumn.value === "object") {
+        node["size"] = col.value;
       }
-      if (colIndex === column) {
-        node["category"] = pushedCategories.indexOf(col.value)
+
+      if (categoryColumn.value?.index === colIndex && typeof categoryColumn.value === "object") {
+        node["category"] = pushedCategories.indexOf(col.value.toString());
       }
     })
     node["id"] = rowIndex
     nodeList.push(node)
   })
-  //Find out columns in he sheet
+
   return nodeList
 }
 
@@ -138,27 +133,6 @@ async function getColumns() {
   columns.value.length = 0
   columns.value.push(...dataTable.columns)
 }
-
-
-// could just call it in mount
-
-
-watch([selectedWorkSheet, sizeColumn, categoryColumn], async () => {
-  await getColumns()
-  convertCellsToJsonObject().then(res => {
-    nodes.value = res
-  })
-
-  generateLinks().then((res => {
-    edges.value = res
-  }))
-
-  generateCategories().then((res => {
-    categories.value = res["categories"]
-    legend.value = res["pushedCategories"]
-  }))
-})
-
 
 async function generateLinks(columnsToLinkOn) {
   let worksheet = await getWorkSheet()
@@ -216,9 +190,10 @@ async function generateLinks(columnsToLinkOn) {
 }
 
 async function generateCategories(column) {
-  column = 2
   if (categoryColumn.value !== null && typeof categoryColumn.value === "object") {
     column = categoryColumn.value["index"]
+  } else {
+    return {"categories": [], "pushedCategories": []}
   }
 
   let worksheet = await getWorkSheet()
@@ -230,14 +205,33 @@ async function generateCategories(column) {
     let category = {}
     row.forEach((col, colIndex) => {
       if (column === colIndex && !pushedCategories.includes(col.value)) {
-        category["name"] = col.value
-        pushedCategories.push(col.value)
+        category["name"] = col.value.toString()
+        pushedCategories.push(col.value.toString())
         categories.push(category)
       }
     })
   })
   return {"categories": categories, "pushedCategories": pushedCategories}
 }
+
+
+watch([selectedWorkSheet, sizeColumn, categoryColumn], async () => {
+  await getColumns()
+  convertCellsToJsonObject().then(res => {
+    nodes.value = res
+  })
+
+  generateLinks().then((res => {
+    edges.value = res
+  }))
+
+  generateCategories().then((res => {
+    categories.value = res["categories"]
+    legend.value = res["pushedCategories"]
+  }))
+})
+
+
 </script>
 
 <template>
@@ -249,9 +243,9 @@ async function generateCategories(column) {
   <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
             label="Select Worksheet"></q-select>
   <!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
-  <!--  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>-->
+  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>
   <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
-  <q-select v-model="categoryColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
+  <q-select v-model="categoryColumn" optionLabel="fieldName" showClear :options="columns" label="Color On"></q-select>
 </template>
 
 <style scoped>
