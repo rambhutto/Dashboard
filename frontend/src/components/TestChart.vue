@@ -34,25 +34,25 @@ let min = ref(Number.MAX_SAFE_INTEGER)
 
 //Call function on prop change/update
 watch(() => [props.edges, props.nodes, props.categories], () => {
-  findMaxMin()
-  makeGraph()
+  if (props.nodes) {
+    findMaxMin()
+    makeGraph()
+  }
 }, {immediate: true})
 
 //findMaximum and minimum of a give node list, used for normalization
 function findMaxMin() {
-  if (props.nodes) {
-    props.nodes.forEach((node, rowIndex) => {
-      if (node["size"]) {
-        if (node["size"] > max.value) {
-          max.value = node["size"]
-        }
-
-        if (node["size"] < min.value) {
-          min.value = node["size"]
-        }
+  props.nodes.forEach((node, rowIndex) => {
+    if (node["size"]) {
+      if (node["size"] > max.value) {
+        max.value = node["size"]
       }
-    })
-  }
+
+      if (node["size"] < min.value) {
+        min.value = node["size"]
+      }
+    }
+  })
 }
 
 //Normalize value so that graph values are easier to read

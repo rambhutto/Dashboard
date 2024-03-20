@@ -6,44 +6,62 @@ const dashboard = ref("")
 const err = ref("")
 
 const currentDataTable = ref({})
-let extensions = ref({})
+let tableau
+
+//Props
+let nodes = ref(null)
+let edges = ref(null)
+let categories = ref(null)
+let legend = ref(null)
 
 let worksheets = ref()
 
+
+let columns = ref([])
+//Option Columns
 let selectedColumns = ref()
 let linkColumns = ref()
 let sizeColumn = ref(6)
 let categoryColumn = ref(2)
 let selectedWorkSheet = ref()
+
 onMounted(async () => {
       try {
-        await initTableau()
+        tableau = await initTableau()
         let worksheet = await getWorkSheet()
         let dataTable = await getSummaryDataTables(worksheet)
         dataTable = await getSourcesDataTables(worksheet)
         currentDataTable.value = dataTable
 
         worksheets.value = await getAllWorkSheets()
+
+        convertCellsToJsonObject().then(res => {
+          nodes.value = res
+        })
+
+        generateLinks().then((res => {
+          edges.value = res
+        }))
       } catch (error) {
         err.value = error;
       }
     }
 )
 
-function log(msg) {
-  dashboard.value = dashboard.value + " " + JSON.stringify(msg)
-}
-
 async function initTableau() {
-  extensions = window.tableau.extensions
+  let tableauExt = window.tableau.extensions
 
   try {
-    await extensions.initializeAsync()
+    await tableauExt.initializeAsync()
   } catch
       (error) {
     err.value = error
   }
-  return extensions
+  return tableauExt
+}
+
+function log(msg) {
+  dashboard.value = dashboard.value + " " + JSON.stringify(msg)
 }
 
 async function getSourcesDataTables(worksheet) {//Currently only returns one data table
@@ -67,11 +85,11 @@ async function getWorkSheet(worksheetName) {
   if (selectedWorkSheet.value != null) {
     worksheetName = selectedWorkSheet.value.name; // Name of the worksheet, make it dynamic later
   }
-  return extensions.dashboardContent.dashboard.worksheets.find(w => w.name === worksheetName)
+  return tableau.dashboardContent.dashboard.worksheets.find(w => w.name === worksheetName)
 }
 
 async function getAllWorkSheets() {
-  return extensions.dashboardContent.dashboard.worksheets
+  return tableau.dashboardContent.dashboard.worksheets
 }
 
 async function convertCellsToJsonObject(colsToInclude, sizeCol) {
@@ -83,7 +101,6 @@ async function convertCellsToJsonObject(colsToInclude, sizeCol) {
     column = categoryColumn.value["index"]
   }
   let nodeList = []
-  await initTableau()
 
   colsToInclude = [7, 8]
 
@@ -122,28 +139,12 @@ async function getColumns() {
   columns.value.push(...dataTable.columns)
 }
 
-let nodes = ref(null)
-let edges = ref(null)
-let categories = ref(null)
-let legend = ref(null)
 
-let columns = ref([])
 // could just call it in mount
-convertCellsToJsonObject().then(res => {
-  nodes.value = res
-})
-
-generateLinks().then((res => {
-  edges.value = res
-}))
 
 
-watch((selectedWorkSheet), async () => {
+watch([selectedWorkSheet, sizeColumn, categoryColumn], async () => {
   await getColumns()
-  await generateLinks()
-})
-
-watch([sizeColumn, categoryColumn], async () => {
   convertCellsToJsonObject().then(res => {
     nodes.value = res
   })
@@ -158,11 +159,8 @@ watch([sizeColumn, categoryColumn], async () => {
   }))
 })
 
-let selected = ref([])
 
 async function generateLinks(columnsToLinkOn) {
-  await initTableau()
-
   let worksheet = await getWorkSheet()
   let dataTable = await getSourcesDataTables(worksheet)
 
@@ -222,7 +220,6 @@ async function generateCategories(column) {
   if (categoryColumn.value !== null && typeof categoryColumn.value === "object") {
     column = categoryColumn.value["index"]
   }
-  await initTableau()
 
   let worksheet = await getWorkSheet()
   let dataTable = await getSourcesDataTables(worksheet)
