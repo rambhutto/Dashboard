@@ -243,49 +243,16 @@ async function generateCategories(column) {
 </script>
 
 <template>
-  <q-layout>
-    <q-drawer
-        show-if-above
-        :width="200"
-        elevated
-        class=" text-white"
-    >
-      <q-scroll-area class="fit">
-        <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
-                  label="Select Worksheet"></q-select>
-        <!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
-        <!--  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>-->
-        <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
-        <button></button>
-      </q-scroll-area>
-    </q-drawer>
-    <q-page-container>
-      <q-page padding>
-
-        <p>{{ err }}</p>
-        <p class="text-wrap"> {{ dashboard }} </p>
-        <div style="height:600px">
-          <test-chart :nodes="nodes" :edges="edges" :categories="categories"></test-chart>
-        </div>
-
-
-      </q-page>
-    </q-page-container>
-  </q-layout>
-
-  <!--  <q-table-->
-  <!--      :rows="currentDataTable.data"-->
-  <!--      :columns="currentDataTable.columns"-->
-  <!--      row-key="rowIndex"-->
-  <!--      :style="{ height: '70vh' }"-->
-  <!--      :dense="true"-->
-  <!--      v-model:selected="selected"-->
-  <!--      selection="single"-->
-  <!--  >-->
-  <!--  </q-table>-->
-  <!--  <div class="q-mt-md">-->
-  <!--    Selected: {{ JSON.stringify(selected) }}-->
-  <!--  </div>-->
+  <p>{{ err }}</p>
+  <p class="text-wrap"> {{ dashboard }} </p>
+  <div style="height:600px; min-width:200px">
+    <test-chart :nodes="nodes" :edges="edges" :categories="categories"></test-chart>
+  </div>
+  <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
+            label="Select Worksheet"></q-select>
+  <!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
+  <!--  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>-->
+  <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
 </template>
 
 <style scoped>
