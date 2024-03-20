@@ -87,6 +87,7 @@ async function convertCellsToJsonObject(colsToInclude) {
         node[dataTable.columns[colIndex].fieldName] = col.value
       }
     })
+    node["id"] = rowIndex
     nodeList.push(node)
   })
   //Find out columns in the sheet
@@ -102,51 +103,110 @@ async function getColumns() {
 }
 
 let nodes = ref(null)
+let edges = ref(null)
 let columns = ref([])
 // could just call it in mount
 convertCellsToJsonObject().then(res => {
   nodes.value = res
 })
+
+generateLinks().then((res =>{
+  edges.value = res
+}))
 let selectedColumns = ref()
+let linkColumns = ref()
 let selectedWorkSheet = ref()
 
 watch((selectedWorkSheet), async () => {
   console.log("changed")
   await getColumns()
+  await generateLinks()
 })
 
 let selected = ref([])
+
+async function generateLinks(columnsToLinkOn) {
+  await initTableau()
+
+  let worksheet = await getWorkSheet()
+  let dataTable = await getSourcesDataTables(worksheet)
+
+  columnsToLinkOn = [8]
+  let colsToList = {}
+  dataTable.data.forEach((row, rowIndex) => {
+    row.forEach((col, colIndex) => {
+      if (columnsToLinkOn.includes(colIndex)) {
+        if (colsToList[colIndex]) {
+          colsToList[colIndex].push(col.value)
+        } else {
+          colsToList[colIndex] = [col.value]
+        }
+      }
+    })
+  })
+
+  let linkList = []
+  let pushed = []
+  //Change the ordering of this for optimization
+  dataTable.data.forEach((row, rowIndex) => {
+    let link = {}
+    row.forEach((col, colIndex) => {
+      columnsToLinkOn.forEach((columnToLinkOn) => {
+        if (columnsToLinkOn.includes(colIndex)) {
+          if (colsToList[columnToLinkOn].includes(col.value) && !pushed.includes(col.value)) {
+            let indices = []
+
+            colsToList[columnToLinkOn].forEach((value, index) => {
+              if (value === col.value) {
+                indices.push(index);
+              }
+            })
+
+            if (indices.includes(rowIndex) && indices.length > 1) {
+              indices.forEach(val => {
+                if (rowIndex !== val) {
+                  link = {
+                    "source": rowIndex,
+                    "target": val,
+                  }
+                  linkList.push(link)
+                  pushed.push(col.value)
+                }
+              })
+            }
+          }
+        }
+      })
+    })
+  })
+  return linkList
+}
+
 </script>
 
 <template>
   <p>{{ err }}</p>
   <p class="text-wrap"> {{ dashboard }} </p>
-  <p class="text-wrap"> {{ selectedColumns }} </p>
-  <p class="text-wrap" v-if="selectedWorkSheet"> {{ selectedWorkSheet.name }} </p>
+  <test-chart :nodes="nodes" :edges="edges"></test-chart>
+
   <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
             label="Select Worksheet"></q-select>
   <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>
+  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>
 
-
-  <test-chart v-if="extensions" :nodes="nodes"></test-chart>
-  <q-table
-      title="Movies"
-      :rows="currentDataTable.data"
-      :columns="currentDataTable.data"
-  ></q-table>
-  <q-table
-      :rows="currentDataTable.data"
-      :columns="currentDataTable.columns"
-      row-key="rowIndex"
-      :style="{ height: '70vh' }"
-      :dense="true"
-      v-model:selected="selected"
-      selection="single"
-  >
-  </q-table>
-  <div class="q-mt-md">
-    Selected: {{ JSON.stringify(selected) }}
-  </div>
+  <!--  <q-table-->
+  <!--      :rows="currentDataTable.data"-->
+  <!--      :columns="currentDataTable.columns"-->
+  <!--      row-key="rowIndex"-->
+  <!--      :style="{ height: '70vh' }"-->
+  <!--      :dense="true"-->
+  <!--      v-model:selected="selected"-->
+  <!--      selection="single"-->
+  <!--  >-->
+  <!--  </q-table>-->
+  <!--  <div class="q-mt-md">-->
+  <!--    Selected: {{ JSON.stringify(selected) }}-->
+  <!--  </div>-->
 </template>
 
 <style scoped>
