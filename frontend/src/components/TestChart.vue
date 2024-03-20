@@ -19,7 +19,8 @@ const option = ref();
 const props = defineProps({
   nodes: undefined,
   edges: undefined,
-  categories: undefined
+  categories: undefined,
+  legend: undefined
 })
 const test = ref({})
 let max = ref(0)
@@ -64,6 +65,13 @@ function normalizeValue(value) {
 
 function makeGraph() {
   option.value = {
+    legend: {
+      type: 'scroll',
+      orient: 'vertical',
+      right: 10,
+      top: 400,
+      data: props.legend
+    },
     series: [
       {
         type: 'graph',
@@ -90,6 +98,12 @@ function makeGraph() {
         },
         edges: props.edges,
         categories: props.categories,
+        emphasis: {
+          focus: 'adjacency',
+          lineStyle: {
+            width: 10
+          }
+        }
       }
     ],
   }

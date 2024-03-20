@@ -80,7 +80,7 @@ async function convertCellsToJsonObject(colsToInclude, sizeCol) {
   }
   let column = 2
   if (categoryColumn.value !== null && typeof categoryColumn.value === "object") {
-    column = sizeColumn.value["index"]
+    column = categoryColumn.value["index"]
   }
   let nodeList = []
   await initTableau()
@@ -104,7 +104,7 @@ async function convertCellsToJsonObject(colsToInclude, sizeCol) {
       if (sizeCol === colIndex) {
         node["size"] = col.value
       }
-      if (colIndex === 2) {
+      if (colIndex === column) {
         node["category"] = pushedCategories.indexOf(col.value)
       }
     })
@@ -125,6 +125,7 @@ async function getColumns() {
 let nodes = ref(null)
 let edges = ref(null)
 let categories = ref(null)
+let legend = ref(null)
 
 let columns = ref([])
 // could just call it in mount
@@ -142,7 +143,7 @@ watch((selectedWorkSheet), async () => {
   await generateLinks()
 })
 
-watch((sizeColumn), async () => {
+watch([sizeColumn, categoryColumn], async () => {
   convertCellsToJsonObject().then(res => {
     nodes.value = res
   })
@@ -153,8 +154,8 @@ watch((sizeColumn), async () => {
 
   generateCategories().then((res => {
     categories.value = res["categories"]
+    legend.value = res["pushedCategories"]
   }))
-  log("this happeend" + sizeColumn.value.index)
 })
 
 let selected = ref([])
@@ -219,7 +220,7 @@ async function generateLinks(columnsToLinkOn) {
 async function generateCategories(column) {
   column = 2
   if (categoryColumn.value !== null && typeof categoryColumn.value === "object") {
-    column = 2
+    column = categoryColumn.value["index"]
   }
   await initTableau()
 
@@ -246,13 +247,14 @@ async function generateCategories(column) {
   <p>{{ err }}</p>
   <p class="text-wrap"> {{ dashboard }} </p>
   <div style="height:600px; min-width:200px">
-    <test-chart :nodes="nodes" :edges="edges" :categories="categories"></test-chart>
+    <test-chart :nodes="nodes" :edges="edges" :categories="categories" :legend="legend"></test-chart>
   </div>
   <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
             label="Select Worksheet"></q-select>
   <!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
   <!--  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>-->
   <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
+  <q-select v-model="categoryColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
 </template>
 
 <style scoped>
