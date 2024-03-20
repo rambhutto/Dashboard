@@ -96,7 +96,6 @@ async function convertCellsToJsonObject() {
   if (!(nameColumn.value !== null && typeof nameColumn.value === "object")) {
     return []
   }
-  log(nameColumn.value.index)
 
   let nodeList = []
 
@@ -141,7 +140,7 @@ async function generateLinks(columnsToLinkOn) {
   if (!(linkColumns.value !== null && typeof linkColumns.value === "object")) {
     return []
   }
-  console.log("what")
+
   let worksheet = await getWorkSheet()
   let dataTable = await getSourcesDataTables(worksheet)
 
@@ -161,7 +160,7 @@ async function generateLinks(columnsToLinkOn) {
 
   let linkList = []
   let pushed = []
-  //Change the ordering of this for optimization
+  //Change the ordering of this for optimization/performance
   dataTable.data.forEach((row, rowIndex) => {
     let link = {}
     row.forEach((col, colIndex) => {

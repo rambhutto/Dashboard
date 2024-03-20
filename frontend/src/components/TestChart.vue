@@ -95,9 +95,8 @@ function makeGraph() {
         }),
         // categories: data.value.categories,
         force: {
-          edgeLength: 15,
-          repulsion: 20,
-          gravity: 0.2
+          edgeLength: 5,
+          repulsion: 5,
         },
         edges: props.edges,
         categories: props.categories,
