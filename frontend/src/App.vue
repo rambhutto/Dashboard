@@ -19,7 +19,7 @@ let worksheets = ref()
 
 let columns = ref([])
 //Option Columns
-let selectedColumns = ref()
+let nameColumn = ref()
 let linkColumns = ref()
 let sizeColumn = ref(6)
 let categoryColumn = ref(2)
@@ -92,10 +92,12 @@ async function getAllWorkSheets() {
   return tableau.dashboardContent.dashboard.worksheets
 }
 
-async function convertCellsToJsonObject(colsToInclude) {
-  let nodeList = []
+async function convertCellsToJsonObject() {
+  if (!(nameColumn.value !== null && typeof nameColumn.value === "object")) {
+    return []
+  }
 
-  colsToInclude = [7]
+  let nodeList = []
 
   let worksheet = await getWorkSheet()
   let dataTable = await getSourcesDataTables(worksheet)
@@ -108,7 +110,7 @@ async function convertCellsToJsonObject(colsToInclude) {
   dataTable.data.forEach((row, rowIndex) => {
     let node = {}
     row.forEach((col, colIndex) => {
-      if (colsToInclude.includes(colIndex)) {
+      if (nameColumn.value?.index !== null && typeof nameColumn.value === "object") {
         node[dataTable.columns[colIndex].fieldName] = col.value
       }
 
@@ -243,7 +245,8 @@ watch([selectedWorkSheet, sizeColumn, categoryColumn], async () => {
   <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
             label="Select Worksheet"></q-select>
   <!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
-  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>
+  <q-select v-model="nameColumn" optionLabel="fieldName" showClear :options="columns" label="Name Column"></q-select>
+  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="Connect On"></q-select>
   <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
   <q-select v-model="categoryColumn" optionLabel="fieldName" showClear :options="columns" label="Color On"></q-select>
 </template>
