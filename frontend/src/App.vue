@@ -87,6 +87,9 @@ async function convertCellsToJsonObject(colsToInclude, sizeCol) {
 
   nodeList = []
 
+  let categoriesObj = await generateCategories()
+  let pushedCategories = categoriesObj["pushedCategories"]
+
   dataTable.data.forEach((row, rowIndex) => {
     let node = {}
     row.forEach((col, colIndex) => {
@@ -95,6 +98,9 @@ async function convertCellsToJsonObject(colsToInclude, sizeCol) {
       }
       if (sizeCol === colIndex) {
         node["size"] = col.value
+      }
+      if (colIndex === 2) {
+        node["category"] = pushedCategories.indexOf(col.value)
       }
     })
     node["id"] = rowIndex
@@ -113,6 +119,8 @@ async function getColumns() {
 
 let nodes = ref(null)
 let edges = ref(null)
+let categories = ref(null)
+
 let columns = ref([])
 // could just call it in mount
 convertCellsToJsonObject().then(res => {
@@ -137,7 +145,11 @@ watch((sizeColumn), async () => {
   generateLinks().then((res => {
     edges.value = res
   }))
-  log("this happeend")
+
+  generateCategories().then((res => {
+    categories.value = res["categories"]
+  }))
+  log("this happeend" + sizeColumn.value.index)
 })
 
 let selected = ref([])
@@ -199,17 +211,38 @@ async function generateLinks(columnsToLinkOn) {
   return linkList
 }
 
+async function generateCategories(column) {
+  column = 2
+  await initTableau()
+
+  let worksheet = await getWorkSheet()
+  let dataTable = await getSourcesDataTables(worksheet)
+
+  let categories = []
+  let pushedCategories = []
+  dataTable.data.forEach((row, rowIndex) => {
+    let category = {}
+    row.forEach((col, colIndex) => {
+      if (column === colIndex && !pushedCategories.includes(col.value)) {
+        category["name"] = col.value
+        pushedCategories.push(col.value)
+        categories.push(category)
+      }
+    })
+  })
+  return {"categories": categories, "pushedCategories": pushedCategories}
+}
 </script>
 
 <template>
   <p>{{ err }}</p>
   <p class="text-wrap"> {{ dashboard }} </p>
-  <test-chart :nodes="nodes" :edges="edges"></test-chart>
+  <test-chart :nodes="nodes" :edges="edges" :categories="categories"></test-chart>
 
   <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
             label="Select Worksheet"></q-select>
-<!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
-<!--  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>-->
+  <!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
+  <!--  <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>-->
   <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="LinkOn"></q-select>
 
   <!--  <q-table-->

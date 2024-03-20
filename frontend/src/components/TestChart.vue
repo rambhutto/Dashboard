@@ -35,20 +35,10 @@ use([
 
 provide(THEME_KEY, 'dark');
 
-onMounted(() => {
-  // setDummyGraphData()
-})
 //Hacky
-watch(() => props.edges, (oldValue, newValue) => {
+watch(() => [props.edges, props.nodes, props.categories], () => {
   findMaxMin()
   makeGraph()
-  console.log(oldValue, newValue)
-}, {immediate: true})
-
-watch(() => props.nodes, (oldValue, newValue) => {
-  findMaxMin()
-  makeGraph()
-  console.log(oldValue, newValue)
 }, {immediate: true})
 
 function findMaxMin() {
@@ -98,7 +88,8 @@ function makeGraph() {
           repulsion: 20,
           gravity: 0.2
         },
-        edges: props.edges
+        edges: props.edges,
+        categories: props.categories,
       }
     ],
   }
