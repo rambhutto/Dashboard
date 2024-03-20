@@ -42,6 +42,8 @@ watch(() => [props.edges, props.nodes, props.categories], () => {
 
 //findMaximum and minimum of a give node list, used for normalization
 function findMaxMin() {
+  max.value = 0
+  min.value = Number.MAX_SAFE_INTEGER
   props.nodes.forEach((node, rowIndex) => {
     if (node["size"]) {
       if (node["size"] > max.value) {
@@ -60,7 +62,7 @@ function normalizeValue(value) {
   if (!value) {
     return 25
   }
-  return (value - min.value) / (max.value - min.value) * 25;
+  return (value - min.value) / (max.value - min.value) * 25 + 2;
 }
 
 function makeGraph() {
@@ -83,10 +85,12 @@ function makeGraph() {
         },
         draggable: true,
         data: props.nodes.map(function (node, idx) {
-          node.name = node["Series Title"]
+          node.name = node["name"]
           node.id = node["id"]
           node["size"] = node["size"]
+
           node.symbolSize = normalizeValue(node["size"])
+          console.log(node["symbolSize"])
           return node;
         }),
         // categories: data.value.categories,

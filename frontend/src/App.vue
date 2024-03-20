@@ -96,6 +96,7 @@ async function convertCellsToJsonObject() {
   if (!(nameColumn.value !== null && typeof nameColumn.value === "object")) {
     return []
   }
+  log(nameColumn.value.index)
 
   let nodeList = []
 
@@ -110,8 +111,8 @@ async function convertCellsToJsonObject() {
   dataTable.data.forEach((row, rowIndex) => {
     let node = {}
     row.forEach((col, colIndex) => {
-      if (nameColumn.value?.index !== null && typeof nameColumn.value === "object") {
-        node[dataTable.columns[colIndex].fieldName] = col.value
+      if (nameColumn.value?.index === colIndex && typeof nameColumn.value === "object") {
+        node["name"] = col.value
       }
 
       if (sizeColumn.value?.index === colIndex && typeof sizeColumn.value === "object") {
@@ -137,10 +138,14 @@ async function getColumns() {
 }
 
 async function generateLinks(columnsToLinkOn) {
+  if (!(linkColumns.value !== null && typeof linkColumns.value === "object")) {
+    return []
+  }
+  console.log("what")
   let worksheet = await getWorkSheet()
   let dataTable = await getSourcesDataTables(worksheet)
 
-  columnsToLinkOn = [8]
+  columnsToLinkOn = [linkColumns.value.index]
   let colsToList = {}
   dataTable.data.forEach((row, rowIndex) => {
     row.forEach((col, colIndex) => {
@@ -217,7 +222,7 @@ async function generateCategories(column) {
 }
 
 
-watch([selectedWorkSheet, sizeColumn, categoryColumn], async () => {
+watch([selectedWorkSheet, nameColumn, linkColumns, sizeColumn, categoryColumn], async () => {
   await getColumns()
   convertCellsToJsonObject().then(res => {
     nodes.value = res
@@ -244,7 +249,6 @@ watch([selectedWorkSheet, sizeColumn, categoryColumn], async () => {
   </div>
   <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
             label="Select Worksheet"></q-select>
-  <!--  <q-select v-model="selectedColumns" optionLabel="fieldName" showClear :options="columns" label="Node"></q-select>-->
   <q-select v-model="nameColumn" optionLabel="fieldName" showClear :options="columns" label="Name Column"></q-select>
   <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="Connect On"></q-select>
   <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
