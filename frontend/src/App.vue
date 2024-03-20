@@ -21,10 +21,11 @@ let columns = ref([])
 //Option Columns
 let nameColumn = ref()
 let linkColumns = ref()
-let sizeColumn = ref(6)
-let categoryColumn = ref(2)
+let sizeColumn = ref()
+let categoryColumn = ref()
 let selectedWorkSheet = ref()
-
+//Use underlying data
+let useUnderLyingData = ref(false)
 onMounted(async () => {
       try {
         tableau = await initTableau()
@@ -64,6 +65,22 @@ function log(msg) {
   dashboard.value = dashboard.value + " " + JSON.stringify(msg)
 }
 
+async function getWorkSheet(worksheetName) {
+  worksheetName = "Imdb_WS"
+  if (selectedWorkSheet.value != null) {
+    worksheetName = selectedWorkSheet.value.name; // Name of the worksheet, make it dynamic later
+  }
+  return tableau.dashboardContent.dashboard.worksheets.find(w => w.name === worksheetName)
+}
+
+async function getAllWorkSheets() {
+  return tableau.dashboardContent.dashboard.worksheets
+}
+
+async function getDataTables(worksheet) {
+  return useUnderLyingData.value ? getSourcesDataTables(worksheet) : getSummaryDataTables(worksheet)
+}
+
 async function getSourcesDataTables(worksheet) {//Currently only returns one data table
   const dataSources = await worksheet.getDataSourcesAsync();
   const dataSource = dataSources[0];
@@ -80,17 +97,6 @@ async function getSummaryDataTables(worksheet) {
   return dataTable
 }
 
-async function getWorkSheet(worksheetName) {
-  worksheetName = "Imdb_WS"
-  if (selectedWorkSheet.value != null) {
-    worksheetName = selectedWorkSheet.value.name; // Name of the worksheet, make it dynamic later
-  }
-  return tableau.dashboardContent.dashboard.worksheets.find(w => w.name === worksheetName)
-}
-
-async function getAllWorkSheets() {
-  return tableau.dashboardContent.dashboard.worksheets
-}
 
 async function convertCellsToJsonObject() {
   if (!(nameColumn.value !== null && typeof nameColumn.value === "object")) {
@@ -100,7 +106,7 @@ async function convertCellsToJsonObject() {
   let nodeList = []
 
   let worksheet = await getWorkSheet()
-  let dataTable = await getSourcesDataTables(worksheet)
+  let dataTable = await getDataTables(worksheet)
 
   nodeList = []
 
@@ -131,7 +137,7 @@ async function convertCellsToJsonObject() {
 
 async function getColumns() {
   let worksheet = await getWorkSheet()
-  let dataTable = await getSourcesDataTables(worksheet)
+  let dataTable = await getDataTables(worksheet)
   columns.value.length = 0
   columns.value.push(...dataTable.columns)
 }
@@ -142,7 +148,7 @@ async function generateLinks(columnsToLinkOn) {
   }
 
   let worksheet = await getWorkSheet()
-  let dataTable = await getSourcesDataTables(worksheet)
+  let dataTable = await getDataTables(worksheet)
 
   columnsToLinkOn = [linkColumns.value.index]
   let colsToList = {}
@@ -203,7 +209,7 @@ async function generateCategories(column) {
   }
 
   let worksheet = await getWorkSheet()
-  let dataTable = await getSourcesDataTables(worksheet)
+  let dataTable = await getDataTables(worksheet)
 
   let categories = []
   let pushedCategories = []
@@ -220,8 +226,14 @@ async function generateCategories(column) {
   return {"categories": categories, "pushedCategories": pushedCategories}
 }
 
+function clearColumnsValues() {
+  nameColumn.value = null
+  linkColumns.value = null
+  sizeColumn.value = null
+  categoryColumn.value = null
+}
 
-watch([selectedWorkSheet, nameColumn, linkColumns, sizeColumn, categoryColumn], async () => {
+watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn, categoryColumn], async () => {
   await getColumns()
   convertCellsToJsonObject().then(res => {
     nodes.value = res
@@ -246,8 +258,18 @@ watch([selectedWorkSheet, nameColumn, linkColumns, sizeColumn, categoryColumn], 
   <div style="height:600px; min-width:200px">
     <test-chart :nodes="nodes" :edges="edges" :categories="categories" :legend="legend"></test-chart>
   </div>
-  <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
-            label="Select Worksheet"></q-select>
+  <div>
+    <div class="row">
+      <div class="col">
+        <q-select v-model="selectedWorkSheet" clearable optionLabel="name" :options="worksheets"
+                  label="Select Worksheet"></q-select>
+      </div>
+      <div class="col">
+        <q-checkbox v-model="useUnderLyingData" label="Use Underlying Raw Data"
+                    @click="clearColumnsValues"></q-checkbox>
+      </div>
+    </div>
+  </div>
   <q-select v-model="nameColumn" optionLabel="fieldName" showClear :options="columns" label="Name Column"></q-select>
   <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns" label="Connect On"></q-select>
   <q-select v-model="sizeColumn" optionLabel="fieldName" showClear :options="columns" label="Size On"></q-select>
