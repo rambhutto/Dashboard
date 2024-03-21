@@ -14,7 +14,9 @@ let legend = ref(null)
 
 let worksheets = ref()
 
-
+//WorkSheet
+let selectedWorkSheet = ref()
+//All Columns
 let columns = ref([])
 let numericColumns = ref([])
 //Option Columns
@@ -22,19 +24,53 @@ let nameColumn = ref()
 let linkColumns = ref()
 let sizeColumn = ref()
 let categoryColumn = ref()
-let selectedWorkSheet = ref()
 //Use underlying data
 let useUnderLyingData = ref(false)
+//Settings Button
+let settingsButtonDisabled = ref(false)
 
 onMounted(async () => {
       try {
         tableau = await initTableau()
         worksheets.value = await getAllWorkSheets()
+        await setSettings()
       } catch (error) {
-        err.value = error;
+        console.log(error)
       }
     }
 )
+
+//Improve later
+async function setSettings() {
+  let settings = tableau.settings.getAll()
+  console.log(settings)
+  if (settings.hasOwnProperty("selectedWorkSheet")) {
+    selectedWorkSheet.value = {}
+    selectedWorkSheet.value.name = settings["selectedWorkSheet"]
+  }
+  await getColumns()
+
+  if (settings.hasOwnProperty("useUnderLyingData")) {
+    useUnderLyingData.value = JSON.parse(settings["useUnderLyingData"].toLowerCase())
+  }
+
+  if (settings.hasOwnProperty("nameColumn")) {
+    nameColumn.value = columns.value[settings["nameColumn"]]
+  }
+
+  if (settings.hasOwnProperty("linkColumns")) {
+    linkColumns.value = columns.value[settings["linkColumns"]]
+  }
+
+  if (settings.hasOwnProperty("sizeColumn")) {
+    sizeColumn.value = columns.value[settings["sizeColumn"]]
+  }
+
+  if (settings.hasOwnProperty("categoryColumn")) {
+    categoryColumn.value = columns.value[settings["categoryColumn"]]
+  }
+  console.log(selectedWorkSheet)
+}
 
 async function initTableau() {
   let tableauExt = window.tableau.extensions
@@ -233,10 +269,40 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
 })
 
 
+//Lazy settings Save
+async function setAndSaveSettings() {
+  settingsButtonDisabled.value = true
+  if (selectedWorkSheet.value !== null && selectedWorkSheet.value !== undefined) {
+    tableau.settings.set("selectedWorkSheet", selectedWorkSheet.value.name);
+  }
+
+  if (useUnderLyingData.value !== null && useUnderLyingData.value !== undefined) {
+    tableau.settings.set("useUnderLyingData", useUnderLyingData.value);
+  }
+
+  if (nameColumn.value !== null && nameColumn.value !== undefined) {
+    tableau.settings.set("nameColumn", nameColumn.value.index);
+  }
+
+  if (linkColumns.value !== null && linkColumns.value !== undefined) {
+    tableau.settings.set("linkColumns", linkColumns.value.index);
+  }
+
+  if (sizeColumn.value !== null && sizeColumn.value !== undefined) {
+    tableau.settings.set("sizeColumn", sizeColumn.value.index);
+  }
+
+  if (categoryColumn.value !== null && categoryColumn.value !== undefined) {
+    tableau.settings.set("categoryColumn", categoryColumn.value.index);
+  }
+  await tableau.settings.saveAsync()
+  settingsButtonDisabled.value = false
+  console.log("Settings saved")
+}
+
 </script>
 
 <template>
-  <p>{{ err }}</p>
   <p class="text-wrap"> {{ dashboard }} </p>
   <div style="height:600px; min-width:200px">
     <test-chart :nodes="nodes" :edges="edges" :categories="categories" :legend="legend"></test-chart>
@@ -249,7 +315,7 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
       </div>
       <div class="col">
         <q-checkbox v-model="useUnderLyingData" label="Use Underlying Raw Data"
-                    @click="clearColumnsValues"></q-checkbox>
+                    @click="clearColumnsValues()"></q-checkbox>
       </div>
     </div>
     <div class="row">
@@ -270,6 +336,12 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
       <div class="col">
         <q-select v-model="categoryColumn" optionLabel="fieldName" showClear :options="columns"
                   label="Color On"></q-select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col q-mr-md">
+        <q-btn @click="setAndSaveSettings()" :disable="settingsButtonDisabled">Save Data</q-btn>
       </div>
     </div>
   </div>

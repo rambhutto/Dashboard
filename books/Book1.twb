@@ -430,12 +430,12 @@
       <size sizing-mode='automatic' />
       <zones>
         <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
-          <zone h='98120' id='13' param='horz' type-v2='layout-flow' w='98728' x='636' y='940'>
-            <zone h='98120' id='9' param='horz' type-v2='layout-flow' w='2546' x='636' y='940'>
-              <zone h='98120' id='7' type-v2='layout-basic' w='2546' x='636' y='940'>
-                <zone h='98120' id='10' param='horz' type-v2='layout-flow' w='2546' x='636' y='940'>
+          <zone h='98678' id='13' param='horz' type-v2='layout-flow' w='99156' x='422' y='661'>
+            <zone h='98678' id='9' param='horz' type-v2='layout-flow' w='1687' x='422' y='661'>
+              <zone h='98678' id='7' type-v2='layout-basic' w='1687' x='422' y='661'>
+                <zone h='98678' id='10' param='horz' type-v2='layout-flow' w='1687' x='422' y='661'>
                   <zone h='98690' hidden-by-user='true' id='11' name='Imdb_WS' w='1687' x='422' y='655'>
-                    <layout-cache cell-count-w='1' non-cell-size-w='572' type-h='fixed' type-w='cell' />
+                    <layout-cache type-h='fixed' type-w='cell' />
                     <zone-style>
                       <format attr='border-color' value='#000000' />
                       <format attr='border-style' value='none' />
@@ -446,10 +446,17 @@
                 </zone>
               </zone>
             </zone>
-            <zone fixed-size='1849' h='98120' id='12' is-fixed='true' param='horz' type-v2='layout-flow' w='96182' x='3182' y='940'>
-              <zone forceUpdate='true' h='98120' id='29' param='[com.tableau.extensions.dashboard.tutorial.part.0].[0.1.0].[http://localhost:5173/]' type-v2='dashboard-object' w='96182' x='3182' y='940'>
+            <zone fixed-size='1849' h='98678' id='12' is-fixed='true' param='horz' type-v2='layout-flow' w='97469' x='2109' y='661'>
+              <zone forceUpdate='true' h='98678' id='29' param='[com.tableau.extensions.dashboard.tutorial.part.0].[0.1.0].[http://localhost:5173/]' type-v2='dashboard-object' w='97469' x='2109' y='661'>
                 <add-in add-in-id='com.tableau.extensions.dashboard.tutorial.part.0' extension-url='http://localhost:5173/' extension-version='0.1.0' instance-id='73FE6BEE1CAB41B384ECF77C9A135904'>
-                  <instance-settings />
+                  <instance-settings>
+                    <setting key='categoryColumn' value='5' />
+                    <setting key='linkColumns' value='6' />
+                    <setting key='nameColumn' value='4' />
+                    <setting key='selectedWorkSheet' value='Imdb_WS' />
+                    <setting key='sizeColumn' value='2' />
+                    <setting key='useUnderLyingData' value='false' />
+                  </instance-settings>
                   <type-settings>
                     <dashboard />
                   </type-settings>
@@ -489,10 +496,10 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='38' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98120' id='37' param='vert' type-v2='layout-flow' w='98728' x='636' y='940'>
+            <zone h='100000' id='42' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98678' id='41' param='vert' type-v2='layout-flow' w='99156' x='422' y='661'>
                 <zone fixed-size='280' h='98690' id='11' is-fixed='true' name='Imdb_WS' w='1687' x='422' y='655'>
-                  <layout-cache cell-count-w='1' non-cell-size-w='572' type-h='fixed' type-w='cell' />
+                  <layout-cache type-h='fixed' type-w='cell' />
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -501,9 +508,16 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone forceUpdate='true' h='98120' id='29' param='[com.tableau.extensions.dashboard.tutorial.part.0].[0.1.0].[http://localhost:5173/]' type-v2='dashboard-object' w='96182' x='3182' y='940'>
+                <zone forceUpdate='true' h='98678' id='29' param='[com.tableau.extensions.dashboard.tutorial.part.0].[0.1.0].[http://localhost:5173/]' type-v2='dashboard-object' w='97469' x='2109' y='661'>
                   <add-in add-in-id='com.tableau.extensions.dashboard.tutorial.part.0' extension-url='http://localhost:5173/' extension-version='0.1.0' instance-id='73FE6BEE1CAB41B384ECF77C9A135904'>
-                    <instance-settings />
+                    <instance-settings>
+                      <setting key='categoryColumn' value='5' />
+                      <setting key='linkColumns' value='6' />
+                      <setting key='nameColumn' value='4' />
+                      <setting key='selectedWorkSheet' value='Imdb_WS' />
+                      <setting key='sizeColumn' value='2' />
+                      <setting key='useUnderLyingData' value='false' />
+                    </instance-settings>
                     <type-settings>
                       <dashboard />
                     </type-settings>
@@ -780,10 +794,11 @@
     </thumbnail>
     <thumbnail height='192' name='imdb_dashboard' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABJ0AAASdAHeZh94
-      AAACjklEQVR4nO3XO24qQRBA0Z7HIEIIiNgF+98IWyCDlI/GmSVL4/AR+J6TdUWVXKlrWpZl
-      GRA1rw1vt9t4Pp/f78PhMOZ5HtM0fWwx+IRfA7her+NyuYwxxjidTuN8Po/j8fjR5eB/+7c2
-      nKZpbDab8Xg8xjzP3zP4a1YDWJZlvN/vsdvtxuv1GsuyDKcCf9G0dgTf7/cfN8B+vx/b7faj
-      i8EnrAYAFatfIKgQAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgT
+      AAAC4UlEQVR4nO3YsUosWRhG0b+tFqVBEDS0I8Fn8emN9Q000EAw6qAmmsuFgXaCaeHOXis6
+      VCVfsinqbNZ1XQeitsdeHmtjs9n852Pgpx0NYGbm+fn51/nvIM7Ozubh4eHXGf5U3wYwM/P5
+      +TlPT0/z8fExh8NhLi8v5+bmZvb7/Tw+Pp56I5zMtwFsNpu5urqa29vb2e12s9vtZlmWubu7
+      m+vr65/YCCfzr74A67rOsiyz3W5nu93Osixzfn4+y7Kceh+c1LcBrOs6X19f8/b2Nu/v73M4
+      HObi4mJeX19nv9/P/f39T+yEk9gcuwZd13VeXl7+8fz3n2D4kx0NAP7v3GGSJgDSBECaAEgT
       AGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQ
       JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkC
       IE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDS
@@ -792,7 +807,8 @@
       AEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmA
       NAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgT
       AGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQ
-      JgDSBECaAEj7AsvyNKagAus6AAAAAElFTkSuQmCC
+      JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApP0F0ug/RsTsv1UAAAAASUVO
+      RK5CYII=
     </thumbnail>
   </thumbnails>
   <referenced-extensions>
