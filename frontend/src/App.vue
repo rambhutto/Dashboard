@@ -33,8 +33,7 @@ onMounted(async () => {
       try {
         tableau = await initTableau()
         worksheets.value = await getAllWorkSheets()
-
-        setSettings()
+        await setSettings()
       } catch (error) {
         console.log(error)
       }
@@ -42,32 +41,33 @@ onMounted(async () => {
 )
 
 //Improve later
-function setSettings() {
+async function setSettings() {
   let settings = tableau.settings.getAll()
   console.log(settings)
   if (settings.hasOwnProperty("selectedWorkSheet")) {
     selectedWorkSheet.value = {}
     selectedWorkSheet.value.name = settings["selectedWorkSheet"]
   }
+  await getColumns()
 
   if (settings.hasOwnProperty("useUnderLyingData")) {
     useUnderLyingData.value = JSON.parse(settings["useUnderLyingData"].toLowerCase())
   }
 
   if (settings.hasOwnProperty("nameColumn")) {
-    nameColumn.value = settings["nameColumn"]
+    nameColumn.value = columns.value[settings["nameColumn"]]
   }
 
   if (settings.hasOwnProperty("linkColumns")) {
-    linkColumns.value = settings["linkColumns"]
+    linkColumns.value = columns.value[settings["linkColumns"]]
   }
 
   if (settings.hasOwnProperty("sizeColumn")) {
-    sizeColumn.value = settings["sizeColumn"]
+    sizeColumn.value = columns.value[settings["sizeColumn"]]
   }
 
   if (settings.hasOwnProperty("categoryColumn")) {
-    categoryColumn.value = settings["categoryColumn"].value
+    categoryColumn.value = columns.value[settings["categoryColumn"]]
   }
   console.log(selectedWorkSheet)
 }
@@ -281,22 +281,23 @@ async function setAndSaveSettings() {
   }
 
   if (nameColumn.value !== null && nameColumn.value !== undefined) {
-    tableau.settings.set("nameColumn", nameColumn.value);
+    tableau.settings.set("nameColumn", nameColumn.value.index);
   }
 
   if (linkColumns.value !== null && linkColumns.value !== undefined) {
-    tableau.settings.set("linkColumns", linkColumns.value);
+    tableau.settings.set("linkColumns", linkColumns.value.index);
   }
 
   if (sizeColumn.value !== null && sizeColumn.value !== undefined) {
-    tableau.settings.set("sizeColumn", sizeColumn.value);
+    tableau.settings.set("sizeColumn", sizeColumn.value.index);
   }
 
   if (categoryColumn.value !== null && categoryColumn.value !== undefined) {
-    tableau.settings.set("categoryColumn", categoryColumn.value);
+    tableau.settings.set("categoryColumn", categoryColumn.value.index);
   }
   await tableau.settings.saveAsync()
   settingsButtonDisabled.value = false
+  console.log("Settings saved")
 }
 
 </script>

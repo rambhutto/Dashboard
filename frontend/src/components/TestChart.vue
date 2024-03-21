@@ -94,8 +94,8 @@ function makeGraph() {
         edges: props.edges,
         categories: props.categories,
         force: {
-          edgeLength: 5,
-          repulsion: 5,
+          edgeLength: 10,
+          repulsion: 6,
         },
         emphasis: {
           focus: 'adjacency',
