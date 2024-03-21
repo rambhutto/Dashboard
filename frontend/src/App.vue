@@ -15,17 +15,19 @@ let legend = ref(null)
 let worksheets = ref()
 
 //WorkSheet
-let selectedWorkSheet = ref(null)
+let selectedWorkSheet = ref()
 //All Columns
 let columns = ref([])
 let numericColumns = ref([])
 //Option Columns
-let nameColumn = ref(null)
-let linkColumns = ref(null)
-let sizeColumn = ref(null)
-let categoryColumn = ref(null)
+let nameColumn = ref()
+let linkColumns = ref()
+let sizeColumn = ref()
+let categoryColumn = ref()
 //Use underlying data
 let useUnderLyingData = ref(false)
+//Settings Button
+let settingsButton = ref(true)
 
 onMounted(async () => {
       try {
@@ -233,19 +235,44 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
   let cat = await generateCategories()
   categories.value = cat["categories"]
   legend.value = cat["pushedCategories"]
-
-  await setSettings()
 })
 
-//Lazy settings
-async function setSettings(){
-  tableau.settings.set("selectedWorkSheet", selectedWorkSheet.value)
-  tableau.settings.set("useUnderLyingData", useUnderLyingData.value)
-  tableau.settings.set("nameColumn", nameColumn.value)
-  tableau.settings.set("linkColumns", linkColumns.value)
-  tableau.settings.set("sizeColumn", sizeColumn.value)
-  tableau.settings.set("categoryColumn", categoryColumn.value)
+function settingsCanBeSaved() {
+  if (settingsButton.value) {
+    if (selectedWorkSheet && useUnderLyingData && nameColumn && linkColumns && sizeColumn && categoryColumn) {
+      return true
+    }
+  }
+  return false
+}
 
+//Lazy settings
+async function setAndSaveSettings() {
+  settingsButton.value = false
+  if (selectedWorkSheet.value !== null && selectedWorkSheet.value !== undefined) {
+    tableau.settings.set("selectedWorkSheet", selectedWorkSheet.value);
+  }
+
+  if (useUnderLyingData.value !== null && useUnderLyingData.value !== undefined) {
+    tableau.settings.set("useUnderLyingData", useUnderLyingData.value);
+  }
+
+  if (nameColumn.value !== null && nameColumn.value !== undefined) {
+    tableau.settings.set("nameColumn", nameColumn.value);
+  }
+
+  if (linkColumns.value !== null && linkColumns.value !== undefined) {
+    tableau.settings.set("linkColumns", linkColumns.value);
+  }
+
+  if (sizeColumn.value !== null && sizeColumn.value !== undefined) {
+    tableau.settings.set("sizeColumn", sizeColumn.value);
+  }
+
+  if (categoryColumn.value !== null && categoryColumn.value !== undefined) {
+    tableau.settings.set("categoryColumn", categoryColumn.value);
+  }
+  settingsButton.value = true
   await tableau.settings.saveAsync()
 }
 
@@ -285,6 +312,12 @@ async function setSettings(){
       <div class="col">
         <q-select v-model="categoryColumn" optionLabel="fieldName" showClear :options="columns"
                   label="Color On"></q-select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col q-mr-md">
+        <q-btn @click="setAndSaveSettings" :disable="settingsCanBeSaved">Save Data</q-btn>
       </div>
     </div>
   </div>
