@@ -33,7 +33,7 @@
       <connection class='federated'>
         <named-connections>
           <named-connection caption='imdb_top_1000' name='textscan.18s8dek1vp0x1g1512rcx1npa101'>
-            <connection class='textscan' directory='C:/Users/Ramish/Downloads/Imdb_dataset' filename='imdb_top_1000.csv' password='' server='' />
+            <connection class='textscan' directory='C:/Users/BhuttoMR/PycharmProjects/Dashboard/books' filename='imdb_top_1000.csv' password='' server='' />
           </named-connection>
         </named-connections>
         <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='textscan.18s8dek1vp0x1g1512rcx1npa101' name='imdb_top_1000.csv' table='[imdb_top_1000#csv]' type='table'>
@@ -430,10 +430,10 @@
       <size sizing-mode='automatic' />
       <zones>
         <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
-          <zone h='98690' id='13' param='horz' type-v2='layout-flow' w='99156' x='422' y='655'>
-            <zone h='98690' id='9' param='horz' type-v2='layout-flow' w='1687' x='422' y='655'>
-              <zone h='98690' id='7' type-v2='layout-basic' w='1687' x='422' y='655'>
-                <zone h='98690' id='10' param='horz' type-v2='layout-flow' w='1687' x='422' y='655'>
+          <zone h='98120' id='13' param='horz' type-v2='layout-flow' w='98728' x='636' y='940'>
+            <zone h='98120' id='9' param='horz' type-v2='layout-flow' w='2546' x='636' y='940'>
+              <zone h='98120' id='7' type-v2='layout-basic' w='2546' x='636' y='940'>
+                <zone h='98120' id='10' param='horz' type-v2='layout-flow' w='2546' x='636' y='940'>
                   <zone h='98690' hidden-by-user='true' id='11' name='Imdb_WS' w='1687' x='422' y='655'>
                     <layout-cache cell-count-w='1' non-cell-size-w='572' type-h='fixed' type-w='cell' />
                     <zone-style>
@@ -446,8 +446,8 @@
                 </zone>
               </zone>
             </zone>
-            <zone fixed-size='1849' h='98690' id='12' is-fixed='true' param='horz' type-v2='layout-flow' w='97469' x='2109' y='655'>
-              <zone forceUpdate='true' h='98690' id='29' param='[com.tableau.extensions.dashboard.tutorial.part.0].[0.1.0].[http://localhost:5173/]' type-v2='dashboard-object' w='97469' x='2109' y='655'>
+            <zone fixed-size='1849' h='98120' id='12' is-fixed='true' param='horz' type-v2='layout-flow' w='96182' x='3182' y='940'>
+              <zone forceUpdate='true' h='98120' id='29' param='[com.tableau.extensions.dashboard.tutorial.part.0].[0.1.0].[http://localhost:5173/]' type-v2='dashboard-object' w='96182' x='3182' y='940'>
                 <add-in add-in-id='com.tableau.extensions.dashboard.tutorial.part.0' extension-url='http://localhost:5173/' extension-version='0.1.0' instance-id='73FE6BEE1CAB41B384ECF77C9A135904'>
                   <instance-settings />
                   <type-settings>
@@ -489,8 +489,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='36' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98690' id='35' param='vert' type-v2='layout-flow' w='99156' x='422' y='655'>
+            <zone h='100000' id='38' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98120' id='37' param='vert' type-v2='layout-flow' w='98728' x='636' y='940'>
                 <zone fixed-size='280' h='98690' id='11' is-fixed='true' name='Imdb_WS' w='1687' x='422' y='655'>
                   <layout-cache cell-count-w='1' non-cell-size-w='572' type-h='fixed' type-w='cell' />
                   <zone-style>
@@ -501,7 +501,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone forceUpdate='true' h='98690' id='29' param='[com.tableau.extensions.dashboard.tutorial.part.0].[0.1.0].[http://localhost:5173/]' type-v2='dashboard-object' w='97469' x='2109' y='655'>
+                <zone forceUpdate='true' h='98120' id='29' param='[com.tableau.extensions.dashboard.tutorial.part.0].[0.1.0].[http://localhost:5173/]' type-v2='dashboard-object' w='96182' x='3182' y='940'>
                   <add-in add-in-id='com.tableau.extensions.dashboard.tutorial.part.0' extension-url='http://localhost:5173/' extension-version='0.1.0' instance-id='73FE6BEE1CAB41B384ECF77C9A135904'>
                     <instance-settings />
                     <type-settings>
@@ -780,20 +780,19 @@
     </thumbnail>
     <thumbnail height='192' name='imdb_dashboard' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABJ0AAASdAHeZh94
-      AAAC1klEQVR4nO3YvUrkABiG0S9hQWEQC7EcK9Fb8eqt9RIUtBC7KbL1sjBusSPsPudAmvzA
-      2zyEZNm2bRuI+nHs4rE2lmX562Pgux0NYGbm6enpt3Prus7d3d3MCIF/25cBzMx8fHzM4+Pj
-      vL29zeFwmPPz87m6upqbm5t5eHg49UY4mS8DWJZlLi4u5vr6ena73ex2u1nXdfb7/VxeXn7H
-      RjiZ9U9vXJZl1nWdZVl+OeBf9uUbYNu2+fz8nJeXl3l/f5/D4TBnZ2fz+vo6+/1+bm9vv2Mn
-      nMRy7Dfotm3z/Pz8+0PLMvf39ycdBt/haADwv/vjbwD4HwmANAGQJgDSBECaAEgTAGkCIE0A
-      pAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECa
-      AEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmA
-      NAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgT
+      AAACjklEQVR4nO3XO24qQRBA0Z7HIEIIiNgF+98IWyCDlI/GmSVL4/AR+J6TdUWVXKlrWpZl
+      GRA1rw1vt9t4Pp/f78PhMOZ5HtM0fWwx+IRfA7her+NyuYwxxjidTuN8Po/j8fjR5eB/+7c2
+      nKZpbDab8Xg8xjzP3zP4a1YDWJZlvN/vsdvtxuv1GsuyDKcCf9G0dgTf7/cfN8B+vx/b7faj
+      i8EnrAYAFatfIKgQAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgT
       AGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQ
       JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkC
       IE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDS
       BECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0A
       pAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECa
-      AEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGk/AfOROSlV70AmAAAAAElFTkSuQmCC
+      AEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmA
+      NAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgT
+      AGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQ
+      JgDSBECaAEj7AsvyNKagAus6AAAAAElFTkSuQmCC
     </thumbnail>
   </thumbnails>
   <referenced-extensions>
