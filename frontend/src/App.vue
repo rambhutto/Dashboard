@@ -27,19 +27,50 @@ let categoryColumn = ref()
 //Use underlying data
 let useUnderLyingData = ref(false)
 //Settings Button
-let settingsButton = ref(true)
+let settingsButtonDisabled = ref(false)
 
 onMounted(async () => {
       try {
         tableau = await initTableau()
         worksheets.value = await getAllWorkSheets()
 
-        console.log(tableau.settings.getAll())
+        setSettings()
       } catch (error) {
-        err.value = error;
+        console.log(error)
       }
     }
 )
+
+//Improve later
+function setSettings() {
+  let settings = tableau.settings.getAll()
+  console.log(settings)
+  if (settings.hasOwnProperty("selectedWorkSheet")) {
+    selectedWorkSheet.value = {}
+    selectedWorkSheet.value.name = settings["selectedWorkSheet"]
+  }
+
+  if (settings.hasOwnProperty("useUnderLyingData")) {
+    useUnderLyingData.value = JSON.parse(settings["useUnderLyingData"].toLowerCase())
+  }
+
+  if (settings.hasOwnProperty("nameColumn")) {
+    nameColumn.value = settings["nameColumn"]
+  }
+
+  if (settings.hasOwnProperty("linkColumns")) {
+    linkColumns.value = settings["linkColumns"]
+  }
+
+  if (settings.hasOwnProperty("sizeColumn")) {
+    sizeColumn.value = settings["sizeColumn"]
+  }
+
+  if (settings.hasOwnProperty("categoryColumn")) {
+    categoryColumn.value = settings["categoryColumn"].value
+  }
+  console.log(selectedWorkSheet)
+}
 
 async function initTableau() {
   let tableauExt = window.tableau.extensions
@@ -237,20 +268,12 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
   legend.value = cat["pushedCategories"]
 })
 
-function settingsCanBeSaved() {
-  if (settingsButton.value) {
-    if (selectedWorkSheet && useUnderLyingData && nameColumn && linkColumns && sizeColumn && categoryColumn) {
-      return true
-    }
-  }
-  return false
-}
 
-//Lazy settings
+//Lazy settings Save
 async function setAndSaveSettings() {
-  settingsButton.value = false
+  settingsButtonDisabled.value = true
   if (selectedWorkSheet.value !== null && selectedWorkSheet.value !== undefined) {
-    tableau.settings.set("selectedWorkSheet", selectedWorkSheet.value);
+    tableau.settings.set("selectedWorkSheet", selectedWorkSheet.value.name);
   }
 
   if (useUnderLyingData.value !== null && useUnderLyingData.value !== undefined) {
@@ -272,8 +295,8 @@ async function setAndSaveSettings() {
   if (categoryColumn.value !== null && categoryColumn.value !== undefined) {
     tableau.settings.set("categoryColumn", categoryColumn.value);
   }
-  settingsButton.value = true
   await tableau.settings.saveAsync()
+  settingsButtonDisabled.value = false
 }
 
 </script>
@@ -291,7 +314,7 @@ async function setAndSaveSettings() {
       </div>
       <div class="col">
         <q-checkbox v-model="useUnderLyingData" label="Use Underlying Raw Data"
-                    @click="clearColumnsValues"></q-checkbox>
+                    @click="clearColumnsValues()"></q-checkbox>
       </div>
     </div>
     <div class="row">
@@ -317,7 +340,7 @@ async function setAndSaveSettings() {
 
     <div class="row">
       <div class="col q-mr-md">
-        <q-btn @click="setAndSaveSettings" :disable="settingsCanBeSaved">Save Data</q-btn>
+        <q-btn @click="setAndSaveSettings()" :disable="settingsButtonDisabled">Save Data</q-btn>
       </div>
     </div>
   </div>
