@@ -154,7 +154,6 @@ async function convertCellsToJsonObject() {
     })
     nodeList.push(node)
   })
-
   return nodeList
 }
 
@@ -166,54 +165,21 @@ async function generateLinks(columnsToLinkOn) {
   let worksheet = await getWorkSheet()
   let dataTable = await getDataTables(worksheet)
 
-  columnsToLinkOn = [linkColumns.value.index]
+  columnsToLinkOn = linkColumns.value.index
+  let col = linkColumns.value.index
   let colsToList = {}
-  dataTable.data.forEach((row, rowIndex) => {
-    row.forEach((col, colIndex) => {
-      if (columnsToLinkOn.includes(colIndex)) {
-        if (colsToList[colIndex]) {
-          colsToList[colIndex].push(col.value)
-        } else {
-          colsToList[colIndex] = [col.value]
-        }
-      }
-    })
-  })
 
   let linkList = []
   let pushed = []
   //Change the ordering of this for optimization/performance
-  dataTable.data.forEach((row, rowIndex) => {
-    let link = {}
-    row.forEach((col, colIndex) => {
-      columnsToLinkOn.forEach((columnToLinkOn) => {
-        if (columnsToLinkOn.includes(colIndex)) {
-          if (colsToList[columnToLinkOn].includes(col.value) && !pushed.includes(col.value)) {
-            let indices = []
-
-            colsToList[columnToLinkOn].forEach((value, index) => {
-              if (value === col.value) {
-                indices.push(index);
-              }
-            })
-
-            if (indices.includes(rowIndex) && indices.length > 1) {
-              indices.forEach(val => {
-                if (rowIndex !== val) {
-                  link = {
-                    "source": rowIndex,
-                    "target": val,
-                  }
-                  linkList.push(link)
-                  pushed.push(col.value)
-                }
-              })
-            }
-          }
-        }
-      })
-    })
-  })
+  for (let firstRow = 0; firstRow < dataTable.totalRowCount; firstRow++) {
+    for (let secondRow = firstRow + 1; secondRow < dataTable.totalRowCount; secondRow++) {
+      if (dataTable.data[firstRow][col]["value"] === dataTable.data[secondRow][col]["value"]) {
+        linkList.push({source: firstRow, target: secondRow});
+      }
+    }
+  }
+  console.log(linkList)
   return linkList
 }
 
