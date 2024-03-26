@@ -43,11 +43,13 @@ onMounted(async () => {
 //Improve later
 async function setSettings() {
   let settings = tableau.settings.getAll()
-  console.log(settings)
+
   if (settings.hasOwnProperty("selectedWorkSheet")) {
     selectedWorkSheet.value = {}
     selectedWorkSheet.value.name = settings["selectedWorkSheet"]
   }
+
+  useUnderLyingData.value = settings.hasOwnProperty("useUnderLyingData") ? JSON.parse(settings["useUnderLyingData"].toLowerCase()) : false;
   await getColumns()
 
   const optionSettings = ["nameColumn", "linkColumns", "sizeColumn", "categoryColumn"];
@@ -261,32 +263,24 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
 //Lazy settings Save
 async function setAndSaveSettings() {
   settingsButtonDisabled.value = true
-  if (selectedWorkSheet.value !== null && selectedWorkSheet.value !== undefined) {
+
+  if (selectedWorkSheet.value) {
     tableau.settings.set("selectedWorkSheet", selectedWorkSheet.value.name);
   }
 
-  if (useUnderLyingData.value !== null && useUnderLyingData.value !== undefined) {
+  if (useUnderLyingData.value) {
     tableau.settings.set("useUnderLyingData", useUnderLyingData.value);
   }
 
-  if (nameColumn.value !== null && nameColumn.value !== undefined) {
-    tableau.settings.set("nameColumn", nameColumn.value.index);
-  }
+  const optionSettings = ["nameColumn", "linkColumns", "sizeColumn", "categoryColumn"];
+  optionSettings.forEach(option => {
+    if (eval(`${option}.value`)) {
+      tableau.settings.set(option, eval(`${option}.value.index`));
+    }
+  })
 
-  if (linkColumns.value !== null && linkColumns.value !== undefined) {
-    tableau.settings.set("linkColumns", linkColumns.value.index);
-  }
-
-  if (sizeColumn.value !== null && sizeColumn.value !== undefined) {
-    tableau.settings.set("sizeColumn", sizeColumn.value.index);
-  }
-
-  if (categoryColumn.value !== null && categoryColumn.value !== undefined) {
-    tableau.settings.set("categoryColumn", categoryColumn.value.index);
-  }
   await tableau.settings.saveAsync()
   settingsButtonDisabled.value = false
-  console.log("Settings saved")
 }
 
 </script>
