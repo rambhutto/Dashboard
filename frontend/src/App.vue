@@ -129,28 +129,30 @@ async function convertCellsToJsonObject() {
 
   let worksheet = await getWorkSheet()
   let dataTable = await getDataTables(worksheet)
-
-  nodeList = []
-
   let categoriesObj = await generateCategories()
   let pushedCategories = categoriesObj["pushedCategories"]
 
   dataTable.data.forEach((row, rowIndex) => {
-    let node = {}
+    const node = {
+      id: rowIndex,
+      name: "",
+      size: 25,
+      category: ""
+    }
+
     row.forEach((col, colIndex) => {
-      if (nameColumn.value?.index === colIndex && typeof nameColumn.value === "object") {
+      if (nameColumn.value?.index === colIndex) {
         node["name"] = col.value
       }
 
-      if (sizeColumn.value?.index === colIndex && typeof sizeColumn.value === "object") {
+      if (sizeColumn.value?.index === colIndex) {
         node["size"] = col.value;
       }
 
-      if (categoryColumn.value?.index === colIndex && typeof categoryColumn.value === "object") {
+      if (categoryColumn.value?.index === colIndex) {
         node["category"] = pushedCategories.indexOf(col.value.toString());
       }
     })
-    node["id"] = rowIndex
     nodeList.push(node)
   })
 
@@ -160,6 +162,7 @@ async function convertCellsToJsonObject() {
 async function getColumns() {
   let worksheet = await getWorkSheet()
   let dataTable = await getDataTables(worksheet)
+
   columns.value.length = 0
   columns.value.push(...dataTable.columns)
 
