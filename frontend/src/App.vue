@@ -157,29 +157,38 @@ async function convertCellsToJsonObject() {
   return nodeList
 }
 
-async function generateLinks(columnsToLinkOn) {
+async function generateLinks() {
   if (!(linkColumns.value !== null && typeof linkColumns.value === "object")) {
     return []
   }
 
   let worksheet = await getWorkSheet()
   let dataTable = await getDataTables(worksheet)
-
-  columnsToLinkOn = linkColumns.value.index
-  let col = linkColumns.value.index
-  let colsToList = {}
-
   let linkList = []
-  let pushed = []
   //Change the ordering of this for optimization/performance
-  for (let firstRow = 0; firstRow < dataTable.totalRowCount; firstRow++) {
-    for (let secondRow = firstRow + 1; secondRow < dataTable.totalRowCount; secondRow++) {
-      if (dataTable.data[firstRow][col]["value"] === dataTable.data[secondRow][col]["value"]) {
-        linkList.push({source: firstRow, target: secondRow});
+  linkColumns.value.forEach((column) => {
+    for (let firstRow = 0; firstRow < dataTable.totalRowCount; firstRow++) {
+      for (let secondRow = firstRow + 1; secondRow < dataTable.totalRowCount; secondRow++) {
+        if (dataTable.data[firstRow][column.index]["value"] === dataTable.data[secondRow][column.index]["value"]) {
+          linkList.push({source: firstRow, target: secondRow});
+        }
       }
     }
+  })
+  let pushed = []
+  if (linkList.length > 1600) {
+    linkList = []
+    linkColumns.value.forEach((column) => {
+      for (let firstRow = 0; firstRow < dataTable.totalRowCount; firstRow++) {
+        for (let secondRow = firstRow + 1; secondRow < dataTable.totalRowCount; secondRow++) {
+          if (dataTable.data[firstRow][column.index]["value"] === dataTable.data[secondRow][column.index]["value"] && !pushed.includes(dataTable.data[secondRow][column.index]["value"])) {
+            linkList.push({source: firstRow, target: secondRow});
+            pushed.push(dataTable.data[secondRow][column.index]["value"])
+          }
+        }
+      }
+    })
   }
-  console.log(linkList)
   return linkList
 }
 
@@ -273,7 +282,7 @@ async function setAndSaveSettings() {
                   label="Name Column"></q-select>
       </div>
       <div class="col">
-        <q-select v-model="linkColumns" optionLabel="fieldName" showClear :options="columns"
+        <q-select v-model="linkColumns" multiple optionLabel="fieldName" showClear :options="columns"
                   label="Connect On"></q-select>
       </div>
     </div>
