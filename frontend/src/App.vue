@@ -50,26 +50,13 @@ async function setSettings() {
   }
   await getColumns()
 
-  if (settings.hasOwnProperty("useUnderLyingData")) {
-    useUnderLyingData.value = JSON.parse(settings["useUnderLyingData"].toLowerCase())
-  }
-
-  if (settings.hasOwnProperty("nameColumn")) {
-    nameColumn.value = columns.value[settings["nameColumn"]]
-  }
-
-  if (settings.hasOwnProperty("linkColumns")) {
-    linkColumns.value = columns.value[settings["linkColumns"]]
-  }
-
-  if (settings.hasOwnProperty("sizeColumn")) {
-    sizeColumn.value = columns.value[settings["sizeColumn"]]
-  }
-
-  if (settings.hasOwnProperty("categoryColumn")) {
-    categoryColumn.value = columns.value[settings["categoryColumn"]]
-  }
-  console.log(selectedWorkSheet)
+  const optionSettings = ["nameColumn", "linkColumns", "sizeColumn", "categoryColumn"];
+  optionSettings.forEach(option => {
+    if (settings.hasOwnProperty(option)) {
+      const column = columns.value[settings[option]]
+      eval(`${option}.value = column`);
+    }
+  })
 }
 
 async function initTableau() {
@@ -119,6 +106,16 @@ async function getSummaryDataTables(worksheet) {
   return dataTable
 }
 
+async function getColumns() {
+  let worksheet = await getWorkSheet()
+  let dataTable = await getDataTables(worksheet)
+
+  columns.value.length = 0
+  columns.value.push(...dataTable.columns)
+
+  numericColumns.value.length = 0
+  numericColumns.value.push(...dataTable.columns.filter(column => column.dataType === "int" || column.dataType === "float"))
+}
 
 async function convertCellsToJsonObject() {
   if (!(nameColumn.value !== null && typeof nameColumn.value === "object")) {
@@ -157,17 +154,6 @@ async function convertCellsToJsonObject() {
   })
 
   return nodeList
-}
-
-async function getColumns() {
-  let worksheet = await getWorkSheet()
-  let dataTable = await getDataTables(worksheet)
-
-  columns.value.length = 0
-  columns.value.push(...dataTable.columns)
-
-  numericColumns.value.length = 0
-  numericColumns.value.push(...dataTable.columns.filter(column => column.dataType === "int" || column.dataType === "float"))
 }
 
 async function generateLinks(columnsToLinkOn) {
