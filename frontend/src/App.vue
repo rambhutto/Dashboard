@@ -61,6 +61,29 @@ async function setSettings() {
   })
 }
 
+async function setAndSaveSettings() {
+  settingsButtonDisabled.value = true
+
+  if (selectedWorkSheet.value) {
+    tableau.settings.set("selectedWorkSheet", selectedWorkSheet.value.name);
+  }
+
+  if (useUnderLyingData.value) {
+    tableau.settings.set("useUnderLyingData", useUnderLyingData.value);
+  }
+
+  const optionSettings = ["nameColumn", "linkColumns", "sizeColumn", "categoryColumn"];
+  optionSettings.forEach(option => {
+    if (eval(`${option}.value`)) {
+      tableau.settings.set(option, eval(`${option}.value.index`));
+    }
+  })
+
+  await tableau.settings.saveAsync()
+  settingsButtonDisabled.value = false
+}
+
+
 async function initTableau() {
   let tableauExt = window.tableau.extensions
 
@@ -234,29 +257,6 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
   legend.value = cat["pushedCategories"]
 })
 
-
-//Lazy settings Save
-async function setAndSaveSettings() {
-  settingsButtonDisabled.value = true
-
-  if (selectedWorkSheet.value) {
-    tableau.settings.set("selectedWorkSheet", selectedWorkSheet.value.name);
-  }
-
-  if (useUnderLyingData.value) {
-    tableau.settings.set("useUnderLyingData", useUnderLyingData.value);
-  }
-
-  const optionSettings = ["nameColumn", "linkColumns", "sizeColumn", "categoryColumn"];
-  optionSettings.forEach(option => {
-    if (eval(`${option}.value`)) {
-      tableau.settings.set(option, eval(`${option}.value.index`));
-    }
-  })
-
-  await tableau.settings.saveAsync()
-  settingsButtonDisabled.value = false
-}
 
 </script>
 
