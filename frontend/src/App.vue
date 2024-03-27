@@ -28,17 +28,42 @@ let categoryColumn = ref()
 let useUnderLyingData = ref(false)
 //Settings Button
 let settingsButtonDisabled = ref(false)
+const unregisterHandlerFunctions = [];
 
 onMounted(async () => {
       try {
         tableau = await initTableau()
         worksheets.value = await getAllWorkSheets()
         await setSettings()
+        await test()
       } catch (error) {
         console.log(error)
       }
     }
 )
+
+async function test() {
+  const markSelection = window.tableau.TableauEventType.MarkSelectionChanged
+  let test = await getWorkSheet("Imdb_WS")
+  test.addEventListener(markSelection, (selectionEvent) => {
+    test.getSelectedMarksAsync().then((marks) => {
+      console.log(marks)
+    });
+
+  })
+}
+
+async function initTableau() {
+  let tableauExt = window.tableau.extensions
+
+  try {
+    await tableauExt.initializeAsync()
+  } catch
+      (error) {
+    console.log(error)
+  }
+  return tableauExt
+}
 
 //Improve later
 async function setSettings() {
@@ -81,23 +106,6 @@ async function setAndSaveSettings() {
 
   await tableau.settings.saveAsync()
   settingsButtonDisabled.value = false
-}
-
-
-async function initTableau() {
-  let tableauExt = window.tableau.extensions
-
-  try {
-    await tableauExt.initializeAsync()
-  } catch
-      (error) {
-    console.log(error)
-  }
-  return tableauExt
-}
-
-function log(msg) {
-  dashboard.value = dashboard.value + " " + JSON.stringify(msg)
 }
 
 async function getWorkSheet(worksheetName) {
