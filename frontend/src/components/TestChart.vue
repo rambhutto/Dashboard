@@ -111,7 +111,7 @@ function makeGraph() {
         edges: props.edges,
         categories: props.categories,
         force: {
-          edgeLength: 10,
+          edgeLength: 25,
           repulsion: 6,
         },
         emphasis: {

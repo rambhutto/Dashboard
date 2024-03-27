@@ -89,7 +89,11 @@ async function setSettings() {
   useUnderLyingData.value = settings.hasOwnProperty("useUnderLyingData") ? JSON.parse(settings["useUnderLyingData"].toLowerCase()) : false;
   await getColumns()
 
-  const optionSettings = ["nameColumn", "linkColumns", "sizeColumn", "categoryColumn"];
+  if (settings.hasOwnProperty("linkColumns")) {
+    linkColumns.value = JSON.parse(settings.linkColumns).map(linkcol => columns.value[linkcol]);
+  }
+
+  const optionSettings = ["nameColumn", "sizeColumn", "categoryColumn"];
   optionSettings.forEach(option => {
     if (settings.hasOwnProperty(option)) {
       const column = columns.value[settings[option]]
@@ -109,13 +113,18 @@ async function setAndSaveSettings() {
     tableau.settings.set("useUnderLyingData", useUnderLyingData.value);
   }
 
-  const optionSettings = ["nameColumn", "linkColumns", "sizeColumn", "categoryColumn"];
+  const optionSettings = ["nameColumn", "sizeColumn", "categoryColumn"];
   optionSettings.forEach(option => {
     if (eval(`${option}.value`)) {
+      console.log(eval(`${option}.value`))
       tableau.settings.set(option, eval(`${option}.value.index`));
     }
   })
 
+  if (linkColumns.value) {
+    console.log(linkColumns.value, JSON.stringify(linkColumns.value.map((x) => x.index)))
+    tableau.settings.set("linkColumns", JSON.stringify(linkColumns.value.map((x) => x.index)))
+  }
   await tableau.settings.saveAsync()
   settingsButtonDisabled.value = false
 }
