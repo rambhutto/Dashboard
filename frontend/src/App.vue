@@ -133,7 +133,7 @@ async function getSourcesDataTables(worksheet) {//Currently only returns one dat
 }
 
 async function getSummaryDataTables(worksheet) {
-  const dataTableReader = await worksheet.getSummaryDataReaderAsync();
+  const dataTableReader = await worksheet.getSummaryDataReaderAsync(undefined, {"ignoreSelection": true});
   const dataTable = await dataTableReader.getAllPagesAsync();
   await dataTableReader.releaseAsync();
   return dataTable
@@ -263,6 +263,7 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
   let cat = await generateCategories()
   categories.value = cat["categories"]
   legend.value = cat["pushedCategories"]
+  console.log(nodes)
 })
 
 
