@@ -27,6 +27,8 @@ const props = defineProps({
   selectedNodes: undefined,
 })
 
+const emit = defineEmits(['selectedNode'])
+
 const option = ref();//Graph Options
 
 let chart = ref()
@@ -44,12 +46,14 @@ watch(() => [props.nodes, props.edges, props.categories, props.legend], () => {
 
 watch(() => props.selectedNodes, async () => {
   if (chart.value) {
-    console.log(toRaw(props.selectedNodes))
-    console.log(props.nodes, toRaw(props.selectedNodes)[0])
     let newList = toRaw(props.selectedNodes).map((val) => val)
     chart.value.dispatchAction({"type": 'highlight', "name": newList})
   }
 }, {immediate: true})
+
+function selectNode(event){
+  emit('selectedNode', event)
+}
 
 //findMaximum and minimum of a give node list, used for normalization
 function findMaxMin() {
@@ -125,7 +129,7 @@ function makeGraph() {
 </script>
 
 <template>
-  <v-chart ref="chart" class="chart" :option="option" autoresize/>
+  <v-chart ref="chart" class="chart" :option="option" @dblclick="selectNode" autoresize/>
 </template>
 
 <style scoped>

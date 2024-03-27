@@ -57,6 +57,14 @@ async function test() {
   })
 }
 
+async function selectedNode(data) {
+  let workSheet = await getWorkSheet("Imdb_WS")
+  workSheet.selectMarksByValueAsync([{
+    fieldName: data.data.fieldName,
+    value: data.data.name
+  }], window.tableau.SelectionUpdateType.Replace);
+}
+
 async function initTableau() {
   let tableauExt = window.tableau.extensions
 
@@ -171,7 +179,8 @@ async function convertCellsToJsonObject() {
       id: rowIndex,
       name: "",
       size: 25,
-      category: ""
+      category: "",
+      fieldName: dataTable.columns[nameColumn.value?.index].fieldName
     }
 
     row.forEach((col, colIndex) => {
@@ -276,7 +285,7 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
   <p class="text-wrap"> {{ dashboard }} </p>
   <div style="height:600px; min-width:200px">
     <test-chart :nodes="nodes" :edges="edges" :categories="categories" :legend="legend"
-                :selectedNodes="selectedNodes"></test-chart>
+                :selectedNodes="selectedNodes" @selectedNode="selectedNode"></test-chart>
   </div>
   <div>
     <div class="row">
