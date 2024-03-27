@@ -78,6 +78,7 @@ function makeGraph() {
         type: 'graph',
         layout: 'force',
         animation: false,
+        roam: true,
         label: {
           position: 'right',
           formatter: '{b}'
@@ -102,7 +103,7 @@ function makeGraph() {
           lineStyle: {
             width: 10
           }
-        }
+        },
       }
     ],
   }
