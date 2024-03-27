@@ -11,6 +11,7 @@ let nodes = ref(null)
 let edges = ref(null)
 let categories = ref(null)
 let legend = ref(null)
+let selectedNodes = ref(null)
 
 let worksheets = ref()
 
@@ -44,12 +45,15 @@ onMounted(async () => {
 
 async function test() {
   const markSelection = window.tableau.TableauEventType.MarkSelectionChanged
-  let test = await getWorkSheet("Imdb_WS")
-  test.addEventListener(markSelection, (selectionEvent) => {
-    test.getSelectedMarksAsync().then((marks) => {
-      console.log(marks)
-    });
+  let workSheet = await getWorkSheet("Imdb_WS")
 
+  workSheet.addEventListener(markSelection, async (selectionEvent) => {
+    let newList = []
+    let marks = await workSheet.getSelectedMarksAsync()
+    marks.data[0].data.forEach((row, rowIndex) => {
+      newList.push(row[nameColumn.value.index].value)
+    });
+    selectedNodes.value = newList
   })
 }
 
@@ -263,7 +267,6 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
   let cat = await generateCategories()
   categories.value = cat["categories"]
   legend.value = cat["pushedCategories"]
-  console.log(nodes)
 })
 
 
@@ -272,7 +275,8 @@ watch([selectedWorkSheet, useUnderLyingData, nameColumn, linkColumns, sizeColumn
 <template>
   <p class="text-wrap"> {{ dashboard }} </p>
   <div style="height:600px; min-width:200px">
-    <test-chart :nodes="nodes" :edges="edges" :categories="categories" :legend="legend"></test-chart>
+    <test-chart :nodes="nodes" :edges="edges" :categories="categories" :legend="legend"
+                :selectedNodes="selectedNodes"></test-chart>
   </div>
   <div>
     <div class="row">

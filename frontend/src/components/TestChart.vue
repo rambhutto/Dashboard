@@ -1,14 +1,14 @@
 <script setup>
 import {use} from 'echarts/core';
 import {CanvasRenderer} from 'echarts/renderers';
-import {GraphChart, PieChart} from 'echarts/charts';
+import {GraphChart} from 'echarts/charts';
 import {
   TitleComponent,
   TooltipComponent,
   LegendComponent,
 } from 'echarts/components';
 import VChart from 'vue-echarts';
-import {ref, watch} from 'vue';
+import {ref, toRaw, watch} from 'vue';
 
 //Apache Echart related
 use([
@@ -16,28 +16,40 @@ use([
   TitleComponent,
   TooltipComponent,
   LegendComponent,
-  GraphChart
+  GraphChart,
 ]);
 
 const props = defineProps({
   nodes: undefined,
   edges: undefined,
   categories: undefined,
-  legend: undefined
+  legend: undefined,
+  selectedNodes: undefined,
 })
 
 const option = ref();//Graph Options
+
+let chart = ref()
 
 let max = ref(0)
 let min = ref(Number.MAX_SAFE_INTEGER)
 
 //Call function on prop change/update
-watch(() => props, () => {
+watch(() => [props.nodes, props.edges, props.categories, props.legend], () => {
   if (props.nodes) {
     findMaxMin()
     makeGraph()
   }
-}, {immediate: true, deep: true})
+}, {immediate: true})
+
+watch(() => props.selectedNodes, async () => {
+  if (chart.value) {
+    console.log(toRaw(props.selectedNodes))
+    console.log(props.nodes, toRaw(props.selectedNodes)[0])
+    let newList = toRaw(props.selectedNodes).map((val) => val)
+    chart.value.dispatchAction({"type": 'highlight', "name": newList})
+  }
+}, {immediate: true})
 
 //findMaximum and minimum of a give node list, used for normalization
 function findMaxMin() {
@@ -113,7 +125,7 @@ function makeGraph() {
 </script>
 
 <template>
-  <v-chart class="chart" :option="option" autoresize/>
+  <v-chart ref="chart" class="chart" :option="option" autoresize/>
 </template>
 
 <style scoped>
